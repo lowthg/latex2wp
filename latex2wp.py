@@ -158,38 +158,39 @@ def extractbody(m) :
 
     return m
 
-def convertsqb(m) :
 
+def convertsqb(m):
     r = re.compile("\\\\item\\s*\\[.*?\\]")
 
     Litems = r.findall(m)
     Lrest = r.split(m)
 
     m = Lrest[0]
-    for i in range(0,len(Litems)) :
-      s= Litems[i]
-      s=s.replace("\\item","\\nitem")
-      s=s.replace("[","{")
-      s=s.replace("]","}")
-      m=m+s+Lrest[i+1]
+    for i in range(0, len(Litems)):
+        s = Litems[i]
+        s = s.replace("\\item", "\\nitem")
+        s = s.replace("[", "{")
+        s = s.replace("]", "}")
+        m = m + s + Lrest[i + 1]
 
+    # this regex has the problem of also matching for example an equation
+    # environment which starts with a square bracket
     r = re.compile("\\\\begin\\s*\\{\\w+}\\s*\\[.*?\\]")
     Lthms = r.findall(m)
     Lrest = r.split(m)
 
     m = Lrest[0]
-    for i in range(0,len(Lthms)) :
-      s= Lthms[i]
-      s=s.replace("\\begin","\\nbegin")
-      s=s.replace("[","{")
-      s=s.replace("]","}")
-      m=m+s+Lrest[i+1]
+    for i in range(0, len(Lthms)):
+        s = Lthms[i]
+        s = s.replace("\\begin", "\\nbegin")
+        s = s.replace("[", "{")
+        s = s.replace("]", "}")
+        m = m + s + Lrest[i + 1]
 
     return m
 
 
-def converttables(m) :
-        
+def converttables(m):
 
     retable = re.compile("\\\\begin\s*\\{tabular}.*?\\\\end\s*\\{tabular}"
                          "|\\\\begin\s*\\{btabular}.*?\\\\end\s*\\{btabular}")
@@ -612,7 +613,7 @@ convertmacros() procedure.
 
 Then the program separates the mathematical
 from the text parts. (It assumes that the document does
-not start with a mathematical expression.) 
+not start with a mathematical expression.)
 
 It makes one pass through the text part, translating
 environments such as theorem, lemma, proof, enumerate, itemize,
@@ -629,7 +630,7 @@ replace \ref commands by clickable html links.
 The next step is to make a pass through the mathematical environments.
 Displayed equations are numbered and centered, and when a \label{xx}
 command is encountered we give ref[xx] the number of the current
-equation. 
+equation.
 
 A final pass replaces \ref{xx} commands by the number in ref[xx],
 and a clickable link to the referenced location.
@@ -638,14 +639,14 @@ and a clickable link to the referenced location.
 
 inputfile = "wpress.tex"
 outputfile = "wpress.html"
-if len(argv) > 1 :
+if len(argv) > 1:
     inputfile = argv[1]
-    if len(argv) > 2 :
+    if len(argv) > 2:
         outputfile = argv[2]
-    else :
-        outputfile = inputfile.replace(".tex",".html")
-f=open(inputfile)
-s=f.read()
+    else:
+        outputfile = inputfile.replace(".tex", ".html")
+f = open(inputfile)
+s = f.read()
 f.close()
 
 
@@ -654,59 +655,76 @@ f.close()
   and \end{document}, if present, (otherwise it keeps the
   whole document), normalizes the spacing, and removes comments
 """
-s=extractbody(s)
+debug = 0
+
+s = extractbody(s)
+if debug:
+    print('initial s:')
+    print(s)
 
 # formats tables
-s=converttables(s)
+s = converttables(s)
+if debug:
+    print('After converttables:')
+    print(s)
 
 # reformats optional parameters passed in square brackets
-s=convertsqb(s)
+s = convertsqb(s)
+if debug:
+    print('After convertsqb:')
+    print(s)
 
-
-#implement simple macros
-s=convertmacros(s)
+# implement simple macros
+s = convertmacros(s)
+if debug:
+    print('After convertmacros:')
+    print(s)
 
 
 # extracts the math parts, and replaces the with placeholders
 # processes math and text separately, then puts the processed
 # math equations in place of the placeholders
+(math, text) = separatemath(s)
+if debug:
+    print('Just math:')
+    print(math)
+    print('_______________')
 
-(math,text) = separatemath(s) 
 
+s = text[0]
+for i in range(len(math)):
+    s = s + "__math" + str(i) + "__" + text[i + 1]
 
-s=text[0]
-for i in range(len(math)) :
-    s=s+"__math"+str(i)+"__"+text[i+1]
-    
-s = processtext ( s )
-math = processmath ( math )
+s = processtext(s)
+math = processmath(math)
 
 # converts escape sequences such as \$ to HTML codes
 # This must be done after formatting the tables or the '&' in
 # the HTML codes will create problems
 
-for e in esc :
-    s=s.replace(e[1],e[2])
-    for i in range ( len ( math ) ) :
-        math[i] = math[i].replace(e[1],e[3])
+for e in esc:
+    s = s.replace(e[1], e[2])
+    for i in range(len(math)):
+        math[i] = math[i].replace(e[1], e[3])
 
 # puts the math equations back into the text
 
 
-for i in range(len(math)) :
-    s=s.replace("__math"+str(i)+"__",math[i])
+for i in range(len(math)):
+    s = s.replace("__math" + str(i) + "__", math[i])
 
 # translating the \ref{} commands
-s=convertref(s)
+s = convertref(s)
 
 
+if HTML:
+    s = ("<head><style>body{max-width:55em;}a:link{color:#4444aa;}"
+         "a:visited{color:#4444aa;}a:hover{background-color:#aaaaF"
+         "F;}</style></head><body>" + s + "</body></html>")
 
-if HTML :
-    s="<head><style>body{max-width:55em;}a:link{color:#4444aa;}a:visited{color:#4444aa;}a:hover{background-color:#aaaaFF;}</style></head><body>"+s+"</body></html>"
-
-s = s.replace("<p>","\n<p>\n")
+s = s.replace("<p>", "\n<p>\n")
 
 
-f=open(outputfile,"w")
+f = open(outputfile, "w")
 f.write(s)
 f.close()
