@@ -352,84 +352,85 @@ def processmath(M):
     return R
 
 
-def convertcolors(m,c) :
-    if m.find("begin") != -1 :
-        return("<span style=\"color:#"+colors[c]+";\">")
-    else :
-        return("</span>")
+def convertcolors(m, c):
+    if m.find("begin") != -1:
+        return "<span style=\"color:#"+colors[c]+";\">"
+    else:
+        return"</span>"
 
 
-def convertitm(m) :
-    if m.find("begin") != -1 :
-        return ("\n\n<ul>")
-    else :
-        return ("\n</ul>\n\n")
+def convertitm(m):
+    if m.find("begin") != -1:
+        return "\n\n<ul>"
+    else:
+        return "\n</ul>\n\n"
 
-def convertenum(m) :
+def convertenum(m):
   
     global itemno
     
-    if m.find("begin") != -1 :
+    if m.find("begin") != -1:
         itemno = 0
-        return ("\n\n<ol>")
-    else :
+        return "\n\n<ol>"
+    else:
         itemno = -1
-        return ("\n</ol>\n\n")
+        return "\n</ol>\n\n"
 
 
-def convertbeginnamedthm(thname,thm,thmlabel) :
-  global inthm
-  global labelused
+def convertbeginnamedthm(thname, thm, thmlabel):
+    global inthm
+    global labelused
 
-  count[T[thm]] +=1
-  inthm = thm
-  labelused = True
-  t = beginnamedthm.replace("_ThmType_",thm.capitalize())
-  t = t.replace("_ThmNumb_",str(count[T[thm]]))
-  t = t.replace("_ThmName_",thname)
-  if thmlabel == "":
-    t = t.replace("_ThmLabel_", "")
-  else:
-    t = t.replace("_ThmLabel_", " id=\""+thmlabel+"\"")
-  return(t)
-
-def convertbeginthm(thm,thmlabel) :
-  global inthm
-  global labelused
-
-  count[T[thm]] +=1
-  inthm = thm
-  labelused = True
-  t = beginthm.replace("_ThmType_",thm.capitalize())
-  t = t.replace("_ThmNumb_",str(count[T[thm]]))
-  if thmlabel == "":
-    t = t.replace("_ThmLabel_", "")
-  else:
-    t = t.replace("_ThmLabel_", " id=\""+thmlabel+"\"")
-  return(t)
- 
-def convertendthm(thm) :
-  global inthm
-
-  inthm = ""
-  return(endthm)
+    count[T[thm]] += 1
+    inthm = thm
+    labelused = True
+    t = beginnamedthm.replace("_ThmType_", thm.capitalize())
+    t = t.replace("_ThmNumb_", str(count[T[thm]]))
+    t = t.replace("_ThmName_", thname)
+    if thmlabel == "":
+        t = t.replace("_ThmLabel_", "")
+    else:
+        t = t.replace("_ThmLabel_", " id=\""+thmlabel+"\"")
+    return t
 
 
-def convertlab(m) :
+def convertbeginthm(thm, thmlabel):
+    global inthm
+    global labelused
+
+    count[T[thm]] += 1
+    inthm = thm
+    labelused = True
+    t = beginthm.replace("_ThmType_", thm.capitalize())
+    t = t.replace("_ThmNumb_", str(count[T[thm]]))
+    if thmlabel == "":
+        t = t.replace("_ThmLabel_", "")
+    else:
+        t = t.replace("_ThmLabel_", " id=\""+thmlabel+"\"")
+    return t
+
+
+def convertendthm(thm):
+    global inthm
+
+    inthm = ""
+    return endthm
+
+
+def convertlab(m):
     global inthm
     global ref
     global itemno
     
-    m=cb.split(m)[1]
-    m=m.replace(":", "")
-    if inthm != "" :
-        ref[m]=count[T[inthm]]
-    elif itemno>0 :
-        ref[m]=itemno
-    else :
-        ref[m]=count["section"]
-    return("<a name=\""+m+"\"></a>")
-        
+    m = cb.split(m)[1]
+    m = m.replace(":", "")
+    if inthm != "":
+        ref[m] = count[T[inthm]]
+    elif itemno > 0:
+        ref[m] = itemno
+    else:
+        ref[m] = count["section"]
+    return "<a name=\""+m+"\"></a>"
 
 
 def convertproof(m) :
