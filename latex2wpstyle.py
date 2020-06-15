@@ -52,24 +52,25 @@ ThmEnvs = ["theorem","definition","lemma","proposition","corollary","claim",
 # the way \begin{theorem}, \begin{lemma} etc are translated in HTML
 # the string _ThmType_ stands for the type of theorem
 # the string _ThmNumb_ is the theorem number
-beginthm = "\n<blockquote><b>_ThmType_ _ThmNumb_</b> <em>"
+# the string _ThmLabel_ is replaced by "" or "id=.."
+beginthm = "\n<blockquote_ThmLabel_ style=\"margin-right:0px;font-style:normal\"><b>_ThmType_ _ThmNumb_</b> <i>"
 
 # translation of \begin{theorem}[...]. The string
 # _ThmName_ stands for the content betwee the
 # square brackets
-beginnamedthm = "\n<blockquote><b>_ThmType_ _ThmNumb_ (_ThmName_)</b> <em>"
+beginnamedthm = "\n<blockquote_ThmLabel_ style=\"margin-right:0;font-style:normal\"><b>_ThmType_ _ThmNumb_ (_ThmName_)</b> <i>"
 
 #translation of \end{theorem}, \end{lemma}, etc.
-endthm = "</em></blockquote>\n<p>\n"
+endthm = "</i></blockquote>\n<p>\n"
 
 
 beginproof = "<em>Proof:</em> "
-endproof = "$latex \Box&fg=000000$\n\n"
+endproof = "&#x2b1c;\n\n"
 
-section = "\n<p>\n<b>_SecNumb_. _SecName_ </b>\n<p>\n"
-sectionstar = "\n<p>\n<b> _SecName_ </b>\n<p>\n"
-subsection = "\n<p>\n<b>  _SecNumb_._SubSecNumb_. _SecName_ </b>\n<p>\n"
-subsectionstar = "\n<p>\n<b> _SecName_ </b>\n<p>\n"
+section = "\n<p>\n<h3_SecLabel_>_SecNumb_. _SecName_ </h3>\n<p>\n"
+sectionstar = "\n<p>\n<h3_SecLabel_> _SecName_ </h3>\n<p>\n"
+subsection = "\n<p>\n<h4_SecLabel_>  _SecNumb_._SubSecNumb_. _SecName_ </h4>\n<p>\n"
+subsectionstar = "\n<p>\n<h4_SecLabel_> _SecName_ </h4>\n<p>\n"
 
 # Font styles. Feel free to add others. The key *must* contain
 # an open curly bracket. The value is the namem of a HTML tag.
@@ -95,8 +96,10 @@ fontstyle = {
 
 M = [     ["\\to","\\rightarrow"] ,
           ["\\B","\\{ 0,1 \\}" ],
-          ["\\E","\mathop{\\mathbb E}"],
-          ["\\P","\mathop{\\mathbb P}"],
+#          ["\\E","\mathop{\\mathbb E}"],
+          ["\\E","{\\mathbb E}"],
+#          ["\\P","\mathop{\\mathbb P}"],
+          ["\\P","{\\mathbb P}"],
           ["\\N","{\\mathbb N}"],
           ["\\Z","{\\mathbb Z}"],
           ["\\C","{\\mathbb C}"],

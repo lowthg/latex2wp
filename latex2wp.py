@@ -42,6 +42,8 @@ if HTML : endproof = "<img src=\"http://l.wordpress.com/latex.php?latex=\Box&fg=
 
 
 inthm = ""
+itemno = -1
+labelused = False
 
 """
  At the beginning, the commands \$, \% and \& are temporarily
@@ -55,7 +57,8 @@ esc = [["\\$","_dollar_","&#36;","\\$"],
        ["\\%","_percent_","&#37;","\\%"],
        ["\\&","_amp_","&amp;","\\&"],
        [">","_greater_",">","&gt;"],
-       ["<","_lesser_","<","&lt;"]]
+       ["<","_lesser_","<","&lt;"],
+       ["\enspace", "_ensp_", "&ensp;", "&ensp;"]]
 
 M = M + [ ["\\more","<!--more-->"],
           ["\\newblock","\\\\"],
@@ -88,13 +91,19 @@ Mnomath =[["\\\\","<br/>\n"],
           ["\\`u","&ugrave;"],
           ["\\'u","&uacute;"],
           ["\\\"u","&uuml;"],
-          ["\\v{C}","&#268;"]]
+          ["\\v{C}","&#268;"],
+          ["\\^o","&ocirc;"],
+          ["\\=o","&#333;"],
+          ["\\salg","&sigma;-algebra"],
+          ["\\qed","&#x2b1c;\n\n"],
+          ["\\lbar","&#x0142;"],
+          ["\\amp","&"]]
 
 
 cb = re.compile("\\{|}")
 
-def extractbody(m) :
 
+def extractbody(m):
     begin = re.compile("\\\\begin\s*")
     m= begin.sub("\\\\begin",m)
     end = re.compile("\\\\end\s*")
@@ -103,9 +112,9 @@ def extractbody(m) :
     beginenddoc = re.compile("\\\\begin\\{document}"
                           "|\\\\end\\{document}")
     parse = beginenddoc.split(m)
-    if len(parse)== 1 :
+    if len(parse) == 1 :
        m = parse[0]
-    else :
+    else:
        m = parse[1]
 
     """
@@ -117,7 +126,7 @@ def extractbody(m) :
         m = m.replace(e[0],e[1])
 
     comments = re.compile("%.*?\n")
-    m=comments.sub(" ",m)
+    m = comments.sub(" ",m)
 
         
 
@@ -153,60 +162,54 @@ def extractbody(m) :
     for i in range(1,(len(L)+1)/2) :
         m = m+ "\\[" + L[2*i-1] + "\\]" + L[2*i]
 
-    m=m.replace("\\begin{eqnarray*}","\\[ \\begin{array}{rcl} ")
-    m=m.replace("\\end{eqnarray*}","\\end{array} \\]")
+    m = m.replace("\\begin{eqnarray*}","\\[ \\setlength\\arraycolsep{2pt} \\begin{array}{rcl}")
+    m = m.replace("\\end{eqnarray*}","\\end{array} \\]")
 
     return m
 
 
-def convertsqb(m):
+def convertsqb(m) :
+
     r = re.compile("\\\\item\\s*\\[.*?\\]")
 
     Litems = r.findall(m)
     Lrest = r.split(m)
 
     m = Lrest[0]
-    for i in range(0, len(Litems)):
-        s = Litems[i]
-        s = s.replace("\\item", "\\nitem")
-        s = s.replace("[", "{")
-        s = s.replace("]", "}")
-        m = m + s + Lrest[i + 1]
+    for i in range(0,len(Litems)) :
+      s= Litems[i]
+      s=s.replace("\\item","\\nitem")
+      s=s.replace("[","{")
+      s=s.replace("]","}")
+      m=m+s+Lrest[i+1]
 
-    # this regex has the problem of also matching for example an equation
-    # environment which starts with a square bracket
     r = re.compile("\\\\begin\\s*\\{\\w+}\\s*\\[.*?\\]")
     Lthms = r.findall(m)
     Lrest = r.split(m)
 
     m = Lrest[0]
-    for i in range(0, len(Lthms)):
-        s = Lthms[i]
-        s = s.replace("\\begin", "\\nbegin")
-        s = s.replace("[", "{")
-        s = s.replace("]", "}")
-        m = m + s + Lrest[i + 1]
+    for i in range(0,len(Lthms)) :
+      s= Lthms[i]
+      s=s.replace("\\begin","\\nbegin")
+      s=s.replace("[","{")
+      s=s.replace("]","}")
+      m=m+s+Lrest[i+1]
 
     return m
 
 
-def converttables(m):
+def converttables(m) :
+        
 
-    retable = re.compile("\\\\begin\s*\\{tabular}.*?\\\\end\s*\\{tabular}"
-                         "|\\\\begin\s*\\{btabular}.*?\\\\end\s*\\{btabular}")
+    retable = re.compile("\\\\begin\s*\\{tabular}.*?\\\\end\s*\\{tabular}")
     tables = retable.findall(m)
     rest = retable.split(m)
 
-
     m = rest[0]
+
     for i in range(len(tables)) :
-        if tables[i].find("{btabular}") != -1 :
-            m = m + convertonetable(tables[i],True)
-        else :
-            m = m + convertonetable(tables[i],False)
+        m = m + convertonetable(tables[i])
         m = m + rest[i+1]
-
-
     return m
 
 
@@ -227,42 +230,50 @@ def convertmacros(m) :
     return(r)
 
 
-def convertonetable(m,border) :
+def convertonetable(m) :
 
     tokens = re.compile("\\\\begin\\{tabular}\s*\\{.*?}"
                         "|\\\\end\\{tabular}"
-                        "|\\\\begin\\{btabular}\s*\\{.*?}"
-                        "|\\\\end\\{btabular}"
                         "|&|\\\\\\\\")
 
-    align = { "c" : "center", "l" : "left" , "r" : "right" }
+    align = {"c": "center", "l": "left", "r": "right"}
 
+    m = m.replace("\\hline", "")
     T = tokens.findall(m)
     C = tokens.split(m)
 
-
     L = cb.split(T[0])
-    format = L[3]
+    border = "|" in L[3]
+    format = L[3].replace("|", "")
 
     columns = len(format)
-    if border :
-        m = "<table border=\"1\" align=center>"
-    else :
-        m="<table align = center><tr>"
-    p=1
-    i=0
+    m = "<table style=\"width:auto;margin-left:auto;margin-right:auto; border-collapse:collapse;border:none\">"
+    if border:
+        padding = "padding:4;border:1px solid"
+    else:
+        padding = "border:none;"
+    p = 1
+    i = 0
 
-    
-    while T[p-1] != "\\end{tabular}" and T[p-1] != "\\end{btabular}":
-        m = m + "<td align="+align[format[i]]+">" + C[p] + "</td>"
-        p=p+1
-        i=i+1
-        if T[p-1]=="\\\\" :
+    end1 = "\\end{tabular}"
+    while T[p-1] != end1:
+        # m = m + "<td align="+align[format[i]]+">" + C[p] + "</td>"
+        cell = C[p].strip()
+        if i == 0:
+            if cell == "" and T[p] == end1:
+                break
+            m = m + "<tr>"
+        m = m + "<td style=\"text-align:"+align[format[i]]+";" + padding + "\">" + cell + "</td>"
+        p = p+1
+        i = i+1
+        if T[p-1] == "\\\\":
             for i in range (p,columns) :
                 m=m+"<td></td>"
-            m=m+"</tr><tr>"
-            i=0
-    m = m+ "</tr></table>"
+            m=m+"</tr>"
+            i = 0
+    if i > 0:
+        m = m + "</tr>"
+    m = m + "</table>"
     return (m)
  
 
@@ -313,17 +324,18 @@ def processmath( M ) :
                 m="$latex {"+mb[1]+"}"+endlatex+"$"
 
         else :
-            if md[0].find("\\begin") != -1 :
-                count["equation"] += 1
-                mb[1] = mb[1] + "\\ \\ \\ \\ \\ ("+str(count["equation"])+")"
+          
+#            if md[0].find("\\begin") != -1 :
+#                count["equation"] += 1
+#                mb[1] = mb[1] + "\\ \\ \\ \\ \\ ("+str(count["equation"])+")"
             if HTML :
                 mb[1]=mb[1].replace("+","%2B")
                 mb[1]=mb[1].replace("&","%26")
                 mb[1]=mb[1].replace(" ","+")
                 mb[1]=mb[1].replace("'","&#39;")
-                m = "<p align=center><img src=\"http://l.wordpress.com/latex.php?latex=\displaystyle " + mb[1] +endlatex+"\"></p>\n"
+                m = "<img src=\"http://l.wordpress.com/latex.php?latex=\displaystyle " + mb[1] +endlatex+"\">"
             else :
-                m = "<p align=center>$latex \displaystyle " + mb[1] +endlatex+"$</p>\n"
+                m = "$latex \displaystyle " + mb[1] +endlatex+"$"
             if m.find("\\label") != -1 :
                 mnolab = label.split(m)
                 mlab = label.findall(m)
@@ -336,9 +348,15 @@ def processmath( M ) :
                 lab = mlab[0]
                 lab=cb.split(lab)[1]
                 lab=lab.replace(":","")
+                count["equation"] += 1
                 ref[lab]=count["equation"]
+                m=mnolab[0]+mnolab[1]
 
-                m="<a name=\""+lab+"\">"+mnolab[0]+mnolab[1]+"</a>"
+                mcell = "<td style=\"border:none;text-align:center\">"+m+"</td>"
+                numcell = "<td style=\"width:0;white-space:nowrap;border:none;text-align:right;font-style:normal;padding-left:5px\">("+str(count["equation"])+")</td>"
+                m="\n<table id=\"" + lab + "\" style=\"width:100%;border:none\"><tr>" + mcell + numcell + "</tr></table>\n"
+            else :
+                m="<p align=center>"+m+"</p>\n"
 
         R= R + [m]
     return R
@@ -358,29 +376,46 @@ def convertitm(m) :
         return ("\n</ul>\n\n")
 
 def convertenum(m) :
+  
+    global itemno
+    
     if m.find("begin") != -1 :
+        itemno = 0
         return ("\n\n<ol>")
     else :
+        itemno = -1
         return ("\n</ol>\n\n")
 
 
-def convertbeginnamedthm(thname,thm) :
+def convertbeginnamedthm(thname,thm,thmlabel) :
   global inthm
+  global labelused
 
   count[T[thm]] +=1
   inthm = thm
+  labelused = True
   t = beginnamedthm.replace("_ThmType_",thm.capitalize())
   t = t.replace("_ThmNumb_",str(count[T[thm]]))
   t = t.replace("_ThmName_",thname)
+  if thmlabel == "":
+    t = t.replace("_ThmLabel_", "")
+  else:
+    t = t.replace("_ThmLabel_", " id=\""+thmlabel+"\"")
   return(t)
 
-def convertbeginthm(thm) :
+def convertbeginthm(thm,thmlabel) :
   global inthm
+  global labelused
 
   count[T[thm]] +=1
   inthm = thm
+  labelused = True
   t = beginthm.replace("_ThmType_",thm.capitalize())
   t = t.replace("_ThmNumb_",str(count[T[thm]]))
+  if thmlabel == "":
+    t = t.replace("_ThmLabel_", "")
+  else:
+    t = t.replace("_ThmLabel_", " id=\""+thmlabel+"\"")
   return(t)
  
 def convertendthm(thm) :
@@ -393,12 +428,14 @@ def convertendthm(thm) :
 def convertlab(m) :
     global inthm
     global ref
-
+    global itemno
     
     m=cb.split(m)[1]
     m=m.replace(":","")
     if inthm != "" :
         ref[m]=count[T[inthm]]
+    elif itemno>0 :
+        ref[m]=itemno
     else :
         ref[m]=count["section"]
     return("<a name=\""+m+"\"></a>")
@@ -412,9 +449,10 @@ def convertproof(m) :
         return(endproof)
     
 
-def convertsection (m) :
-
+def convertsection (m,label) :
+      global labelused
  
+      labelused = True
       L=cb.split(m)
 
       """
@@ -432,11 +470,16 @@ def convertsection (m) :
 
       t=t.replace("_SecNumb_",str(count["section"]) )
       t=t.replace("_SecName_",L[1])
+      if label == "":
+          t = t.replace("_SecLabel_", "")
+      else:
+          t = t.replace("_SecLabel_", " id=\""+label+"\"")
       return(t)
 
-def convertsubsection (m) :
-
+def convertsubsection (m,label) :
+        global labelused
       
+        labelused = True
         L=cb.split(m)
 
         if L[0].find("*") == -1 :
@@ -448,6 +491,10 @@ def convertsubsection (m) :
         t=t.replace("_SecNumb_",str(count["section"]) )
         t=t.replace("_SubSecNumb_",str(count["subsection"]) )
         t=t.replace("_SecName_",L[1])     
+        if label == "":
+            t = t.replace("_SecLabel_", "")
+        else:
+            t = t.replace("_SecLabel_", " id=\""+label+"\"")
         return(t)
 
 
@@ -470,20 +517,24 @@ def convertstrike (m) :
     return("<s>"+L[1]+"</s>")
 
 def processtext ( t ) :
-        p = re.compile("\\\\begin\\{\\w+}"
-                   "|\\\\nbegin\\{\\w+}\\s*\\{.*?}"
-                   "|\\\\end\\{\\w+}"
-                   "|\\\\item"
-                   "|\\\\nitem\\s*\\{.*?}"
-                   "|\\\\label\\s*\\{.*?}"
-                   "|\\\\section\\s*\\{.*?}"
-                   "|\\\\section\\*\\s*\\{.*?}"
-                   "|\\\\subsection\\s*\\{.*?}"
-                   "|\\\\subsection\\*\\s*\\{.*?}"
-                   "|\\\\href\\s*\\{.*?}\\s*\\{.*?}"
-                   "|\\\\hrefnosnap\\s*\\{.*?}\\s*\\{.*?}"
-                   "|\\\\image\\s*\\{.*?}\\s*\\{.*?}\\s*\\{.*?}"
-                   "|\\\\sout\\s*\\{.*?}")
+
+        global itemno
+        global labelused
+        
+        p = re.compile(r"\\begin\{\w+}"
+                   r"|\\nbegin\{\w+}\s*\{.*?}"
+                   r"|\\end\{\w+}"
+                   r"|\\item"
+                   r"|\\nitem\s*\{.*?}"
+                   r"|\\label\s*\{.*?}"
+                   r"|\\section\s*\{.*?}"
+                   r"|\\section\*\s*\{.*?}"
+                   r"|\\subsection\s*\{.*?}"
+                   r"|\\subsection\*\s*\{.*?}"
+                   r"|\\href\s*\{.*?}\s*\{.*?}"
+                   r"|\\hrefnosnap\s*\{.*?}\s*\{.*?}"
+                   r"|\\image\s*\{.*?}\s*\{.*?}\s*\{.*?}"
+                   r"|\\sout\s*\{.*?}")
 
 
  
@@ -501,12 +552,20 @@ def processtext ( t ) :
  
         i=0
         while i < len(tcontrol) :
+            if (i+1 < len(tcontrol)) and (tcontrol[i+1].find(r"\label") != -1):
+                label = cb.split(tcontrol[i+1])[1]
+                label = label.replace(":","")
+            else:
+                label = ""
+            labelused = False
             if tcontrol[i].find("{itemize}") != -1 :
                 w=w+convertitm(tcontrol[i])
             elif tcontrol[i].find("{enumerate}") != -1 :
                 w= w+convertenum(tcontrol[i])
             elif tcontrol[i][0:5]=="\\item" :
                 w=w+"<li>"
+                if itemno != -1 :
+                    itemno=itemno+1
             elif tcontrol[i][0:6]=="\\nitem" :
                     lb = tcontrol[i][7:].replace("{","")
                     lb = lb.replace("}","")
@@ -518,9 +577,9 @@ def processtext ( t ) :
             elif tcontrol[i].find("{proof}") != -1 :
                 w = w+convertproof(tcontrol[i])
             elif tcontrol[i].find("\\subsection") != -1 :
-                w = w+convertsubsection(tcontrol[i])
+                w = w+convertsubsection(tcontrol[i],label)
             elif tcontrol[i].find("\\section") != -1 :
-                w = w+convertsection(tcontrol[i])
+                w = w+convertsection(tcontrol[i],label)
             elif tcontrol[i].find("\\label") != -1 :
                 w=w+convertlab(tcontrol[i])
             elif tcontrol[i].find("\\image") != -1 :
@@ -536,14 +595,18 @@ def processtext ( t ) :
                 if tcontrol[i].find("{"+clr+"}") != -1:
                     w=w + convertcolors(tcontrol[i],clr)
               for thm in ThmEnvs :
+                beginthm = False
                 if tcontrol[i]=="\\end{"+thm+"}" :
                     w=w+convertendthm(thm)
                 elif tcontrol[i]=="\\begin{"+thm+"}":
-                    w=w+convertbeginthm(thm)
+                    w=w+convertbeginthm(thm,label)
                 elif tcontrol[i].find("\\nbegin{"+thm+"}") != -1:
-                    L=cb.split(tcontrol[i])
-                    thname=L[3]
-                    w=w+convertbeginnamedthm(thname,thm)
+                    thmname=cb.split(tcontrol[i])[3]
+                    w=w+convertbeginnamedthm(thmname,thm,label)
+            if labelused and label != "":
+                w += ttext[i+1]
+                i += 1
+                convertlab(tcontrol[i])
             w += ttext[i+1]
             i += 1
 
@@ -613,7 +676,7 @@ convertmacros() procedure.
 
 Then the program separates the mathematical
 from the text parts. (It assumes that the document does
-not start with a mathematical expression.)
+not start with a mathematical expression.) 
 
 It makes one pass through the text part, translating
 environments such as theorem, lemma, proof, enumerate, itemize,
@@ -630,7 +693,7 @@ replace \ref commands by clickable html links.
 The next step is to make a pass through the mathematical environments.
 Displayed equations are numbered and centered, and when a \label{xx}
 command is encountered we give ref[xx] the number of the current
-equation.
+equation. 
 
 A final pass replaces \ref{xx} commands by the number in ref[xx],
 and a clickable link to the referenced location.
@@ -644,7 +707,7 @@ if len(argv) > 1:
     if len(argv) > 2:
         outputfile = argv[2]
     else:
-        outputfile = inputfile.replace(".tex", ".html")
+        outputfile = inputfile.replace(".tex",".html")
 f = open(inputfile)
 s = f.read()
 f.close()
@@ -655,45 +718,29 @@ f.close()
   and \end{document}, if present, (otherwise it keeps the
   whole document), normalizes the spacing, and removes comments
 """
-debug = 0
-
 s = extractbody(s)
-if debug:
-    print('initial s:')
-    print(s)
 
 # formats tables
 s = converttables(s)
-if debug:
-    print('After converttables:')
-    print(s)
 
 # reformats optional parameters passed in square brackets
 s = convertsqb(s)
-if debug:
-    print('After convertsqb:')
-    print(s)
 
-# implement simple macros
+
+#implement simple macros
 s = convertmacros(s)
-if debug:
-    print('After convertmacros:')
-    print(s)
 
 
 # extracts the math parts, and replaces the with placeholders
 # processes math and text separately, then puts the processed
 # math equations in place of the placeholders
+
 (math, text) = separatemath(s)
-if debug:
-    print('Just math:')
-    print(math)
-    print('_______________')
 
 
 s = text[0]
 for i in range(len(math)):
-    s = s + "__math" + str(i) + "__" + text[i + 1]
+    s = s+"__math"+str(i)+"__"+text[i+1]
 
 s = processtext(s)
 math = processmath(math)
@@ -703,28 +750,26 @@ math = processmath(math)
 # the HTML codes will create problems
 
 for e in esc:
-    s = s.replace(e[1], e[2])
-    for i in range(len(math)):
-        math[i] = math[i].replace(e[1], e[3])
+    s = s.replace(e[1],e[2])
+    for i in range ( len ( math ) ) :
+        math[i] = math[i].replace(e[1],e[3])
 
 # puts the math equations back into the text
 
-
 for i in range(len(math)):
-    s = s.replace("__math" + str(i) + "__", math[i])
+    s = s.replace("__math"+str(i)+"__",math[i])
 
 # translating the \ref{} commands
 s = convertref(s)
 
 
-if HTML:
-    s = ("<head><style>body{max-width:55em;}a:link{color:#4444aa;}"
-         "a:visited{color:#4444aa;}a:hover{background-color:#aaaaF"
-         "F;}</style></head><body>" + s + "</body></html>")
 
-s = s.replace("<p>", "\n<p>\n")
+if HTML :
+    s="<head><style>body{max-width:55em;}a:link{color:#4444aa;}a:visited{color:#4444aa;}a:hover{background-color:#aaaaFF;}</style></head><body>"+s+"</body></html>"
+
+s = s.replace("<p>","\n<p>\n")
 
 
-f = open(outputfile, "w")
+f=open(outputfile,"w")
 f.write(s)
 f.close()
