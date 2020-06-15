@@ -1,5 +1,5 @@
 #!/bin/sh
 echo "`basename "$1" .tex`.html"
 rm "`basename "$1" .tex`.html"
-python ~/Documents/github/almost-sure/latex2wp/latex2wp.py "$1"
+python ~/Documents/github/latex2wp/latex2wp.py "$1"
 open -a TextEdit.app "`basename "$1" .tex`.html"
