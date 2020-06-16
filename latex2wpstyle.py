@@ -65,6 +65,7 @@ endthm = "</i></blockquote>\n<p>\n"
 
 
 beginproof = "<em>Proof:</em> "
+beginnamedproof = "<em>Proof _PfName_:</em> "
 endproof = "&#x2b1c;\n\n"
 
 section = "\n<p>\n<h3_SecLabel_>_SecNumb_. _SecName_ </h3>\n<p>\n"

@@ -437,6 +437,11 @@ def convertproof(m):
     else:
         return endproof
 
+def convertnamedproof(m, label):
+    if m.find("begin") != -1:
+        return beginnamedproof.replace("_PfName_", label)
+    else:
+        return endproof
 
 def convertsection(m, label):
       global labelused
@@ -556,7 +561,11 @@ def processtext(t):
         elif tcontrol[i].find("\\href") != -1:
             w = w+converturl(tcontrol[i])
         elif tcontrol[i].find("{proof}") != -1:
-            w = w+convertproof(tcontrol[i])
+            pfname=cb.split(tcontrol[i])
+            if len(pfname) > 3:
+                w = w+convertnamedproof(tcontrol[i], pfname[3])
+            else:
+                w = w+convertproof(tcontrol[i])
         elif tcontrol[i].find("\\subsection") != -1:
             w = w+convertsubsection(tcontrol[i],label)
         elif tcontrol[i].find("\\section") != -1:
