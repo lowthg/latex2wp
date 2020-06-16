@@ -196,8 +196,7 @@ def convertsqb(m):
     return m
 
 
-def converttables(m) :
-
+def converttables(m):
     retable = re.compile("\\\\begin\s*\\{tabular}.*?\\\\end\s*\\{tabular}")
     tables = retable.findall(m)
     rest = retable.split(m)
@@ -226,8 +225,7 @@ def convertmacros(m):
     return r
 
 
-def convertonetable(m) :
-
+def convertonetable(m):
     tokens = re.compile("\\\\begin\\{tabular}\s*\\{.*?}"
                         "|\\\\end\\{tabular}"
                         "|&|\\\\\\\\")
@@ -315,7 +313,7 @@ def processmath(M):
 
         else:
           
-            #if md[0].find("\\begin") != -1 :
+            #if md[0].find("\\begin") != -1:
             #   count["equation"] += 1
             #   mb[1] = mb[1] + "\\ \\ \\ \\ \\ ("+str(count["equation"])+")"
             if HTML:
@@ -433,14 +431,14 @@ def convertlab(m):
     return "<a name=\""+m+"\"></a>"
 
 
-def convertproof(m) :
-    if m.find("begin") != -1 :
-        return(beginproof)
-    else :
-        return(endproof)
-    
+def convertproof(m):
+    if m.find("begin") != -1:
+        return beginproof
+    else:
+        return endproof
 
-def convertsection (m,label) :
+
+def convertsection(m, label):
       global labelused
  
       labelused = True
@@ -451,68 +449,66 @@ def convertsection (m,label) :
         L[1] contains the section name
       """
 
-      if L[0].find("*") == -1 :
-          t=section
+      if L[0].find("*") == -1:
+          t = section
           count["section"] += 1
-          count["subsection"]=0
+          count["subsection"] = 0
 
-      else :
-          t=sectionstar
+      else:
+          t = sectionstar
 
-      t=t.replace("_SecNumb_",str(count["section"]) )
-      t=t.replace("_SecName_",L[1])
+      t = t.replace("_SecNumb_", str(count["section"]))
+      t = t.replace("_SecName_", L[1])
       if label == "":
           t = t.replace("_SecLabel_", "")
       else:
           t = t.replace("_SecLabel_", " id=\""+label+"\"")
-      return(t)
+      return t
 
-def convertsubsection (m,label) :
-        global labelused
-      
-        labelused = True
-        L=cb.split(m)
+def convertsubsection(m, label):
+    global labelused
 
-        if L[0].find("*") == -1 :
-            t=subsection
-        else :
-            t=subsectionstar
-        
-        count["subsection"] += 1
-        t=t.replace("_SecNumb_",str(count["section"]) )
-        t=t.replace("_SubSecNumb_",str(count["subsection"]) )
-        t=t.replace("_SecName_",L[1])     
-        if label == "":
-            t = t.replace("_SecLabel_", "")
-        else:
-            t = t.replace("_SecLabel_", " id=\""+label+"\"")
-        return(t)
-
-
-def converturl (m) :
+    labelused = True
     L = cb.split(m)
-    return ("<a href=\""+L[1]+"\">"+L[3]+"</a>")
 
-def converturlnosnap (m) :
+    if L[0].find("*") == -1:
+        t = subsection
+    else:
+        t = subsectionstar
+
+    count["subsection"] += 1
+    t = t.replace("_SecNumb_", str(count["section"]) )
+    t = t.replace("_SubSecNumb_", str(count["subsection"]) )
+    t = t.replace("_SecName_", L[1])     
+    if label == "":
+        t = t.replace("_SecLabel_", "")
+    else:
+        t = t.replace("_SecLabel_", " id=\""+label+"\"")
+    return t
+
+
+def converturl(m):
     L = cb.split(m)
-    return ("<a class=\"snap_noshots\" href=\""+L[1]+"\">"+L[3]+"</a>")
+    return "<a href=\""+L[1]+"\">"+L[3]+"</a>"
+
+def converturlnosnap(m):
+    L = cb.split(m)
+    return "<a class=\"snap_noshots\" href=\""+L[1]+"\">"+L[3]+"</a>"
 
 
-def convertimage (m) :
-    L = cb.split (m)
-    return ("<p align=center><img "+L[1] + " src=\""+L[3]
-         +"\"></p>")
+def convertimage(m):
+    L = cb.split(m)
+    return "<p align=center><img "+L[1]+" src=\""+L[3]+"\"></p>"
 
-def convertstrike (m) :
-    L=cb.split(m)
-    return("<s>"+L[1]+"</s>")
+def convertstrike(m):
+    L = cb.split(m)
+    return "<s>"+L[1]+"</s>"
 
-def processtext ( t ) :
-
-        global itemno
-        global labelused
+def processtext(t):
+    global itemno
+    global labelused
         
-        p = re.compile(r"\\begin\{\w+}"
+    p = re.compile(r"\\begin\{\w+}"
                    r"|\\nbegin\{\w+}\s*\{.*?}"
                    r"|\\end\{\w+}"
                    r"|\\item"
@@ -527,83 +523,77 @@ def processtext ( t ) :
                    r"|\\image\s*\{.*?}\s*\{.*?}\s*\{.*?}"
                    r"|\\sout\s*\{.*?}")
 
+    for s1, s2 in Mnomath:
+        t = t.replace(s1, s2)
 
- 
-        
-        for s1, s2 in Mnomath :
-            t=t.replace(s1,s2)
+    ttext = p.split(t)
+    tcontrol = p.findall(t)
 
-        
-        ttext = p.split(t)
-        tcontrol = p.findall(t)
+    w = ttext[0]
 
- 
-        w = ttext[0]
-
- 
-        i=0
-        while i < len(tcontrol) :
-            if (i+1 < len(tcontrol)) and (tcontrol[i+1].find(r"\label") != -1):
-                label = cb.split(tcontrol[i+1])[1]
-                label = label.replace(":", "")
-            else:
-                label = ""
-            labelused = False
-            if tcontrol[i].find("{itemize}") != -1 :
-                w=w+convertitm(tcontrol[i])
-            elif tcontrol[i].find("{enumerate}") != -1 :
-                w= w+convertenum(tcontrol[i])
-            elif tcontrol[i][0:5]=="\\item" :
-                w=w+"<li>"
-                if itemno != -1 :
-                    itemno=itemno+1
-            elif tcontrol[i][0:6]=="\\nitem" :
-                    lb = tcontrol[i][7:].replace("{", "")
-                    lb = lb.replace("}", "")
-                    w=w+"<li>"+lb
-            elif tcontrol[i].find("\\hrefnosnap") != -1 :
-                w = w+converturlnosnap(tcontrol[i])
-            elif tcontrol[i].find("\\href") != -1 :
-                w = w+converturl(tcontrol[i])
-            elif tcontrol[i].find("{proof}") != -1 :
-                w = w+convertproof(tcontrol[i])
-            elif tcontrol[i].find("\\subsection") != -1 :
-                w = w+convertsubsection(tcontrol[i],label)
-            elif tcontrol[i].find("\\section") != -1 :
-                w = w+convertsection(tcontrol[i],label)
-            elif tcontrol[i].find("\\label") != -1 :
-                w=w+convertlab(tcontrol[i])
-            elif tcontrol[i].find("\\image") != -1 :
-                w = w+convertimage(tcontrol[i])
-            elif tcontrol[i].find("\\sout") != -1 :
-                w = w+convertstrike(tcontrol[i])
-            elif tcontrol[i].find("\\begin") !=-1 and tcontrol[i].find("{center}")!= -1 :
-                w = w+"<p align=center>"
-            elif tcontrol[i].find("\\end")!= -1  and tcontrol[i].find("{center}") != -1 :
-                w = w+"</p>"
-            else :
-              for clr in colorchoice :
-                if tcontrol[i].find("{"+clr+"}") != -1:
-                    w=w + convertcolors(tcontrol[i],clr)
-              for thm in ThmEnvs :
-                beginthm = False
-                if tcontrol[i]=="\\end{"+thm+"}" :
-                    w=w+convertendthm(thm)
-                elif tcontrol[i]=="\\begin{"+thm+"}":
-                    w=w+convertbeginthm(thm,label)
-                elif tcontrol[i].find("\\nbegin{"+thm+"}") != -1:
-                    thmname=cb.split(tcontrol[i])[3]
-                    w=w+convertbeginnamedthm(thmname,thm,label)
-            if labelused and label != "":
-                w += ttext[i+1]
-                i += 1
-                convertlab(tcontrol[i])
+    i = 0
+    while i < len(tcontrol):
+        if (i+1 < len(tcontrol)) and (tcontrol[i+1].find(r"\label") != -1):
+            label = cb.split(tcontrol[i+1])[1]
+            label = label.replace(":", "")
+        else:
+            label = ""
+        labelused = False
+        if tcontrol[i].find("{itemize}") != -1:
+            w=w+convertitm(tcontrol[i])
+        elif tcontrol[i].find("{enumerate}") != -1:
+            w= w+convertenum(tcontrol[i])
+        elif tcontrol[i][0:5]=="\\item":
+            w=w+"<li>"
+            if itemno != -1:
+                itemno=itemno+1
+        elif tcontrol[i][0:6]=="\\nitem":
+                lb = tcontrol[i][7:].replace("{", "")
+                lb = lb.replace("}", "")
+                w=w+"<li>"+lb
+        elif tcontrol[i].find("\\hrefnosnap") != -1:
+            w = w+converturlnosnap(tcontrol[i])
+        elif tcontrol[i].find("\\href") != -1:
+            w = w+converturl(tcontrol[i])
+        elif tcontrol[i].find("{proof}") != -1:
+            w = w+convertproof(tcontrol[i])
+        elif tcontrol[i].find("\\subsection") != -1:
+            w = w+convertsubsection(tcontrol[i],label)
+        elif tcontrol[i].find("\\section") != -1:
+            w = w+convertsection(tcontrol[i],label)
+        elif tcontrol[i].find("\\label") != -1:
+            w=w+convertlab(tcontrol[i])
+        elif tcontrol[i].find("\\image") != -1:
+            w = w+convertimage(tcontrol[i])
+        elif tcontrol[i].find("\\sout") != -1:
+            w = w+convertstrike(tcontrol[i])
+        elif tcontrol[i].find("\\begin") !=-1 and tcontrol[i].find("{center}")!= -1:
+            w = w+"<p align=center>"
+        elif tcontrol[i].find("\\end")!= -1  and tcontrol[i].find("{center}") != -1:
+            w = w+"</p>"
+        else:
+          for clr in colorchoice:
+            if tcontrol[i].find("{"+clr+"}") != -1:
+                w=w + convertcolors(tcontrol[i],clr)
+          for thm in ThmEnvs:
+            beginthm = False
+            if tcontrol[i]=="\\end{"+thm+"}":
+                w=w+convertendthm(thm)
+            elif tcontrol[i]=="\\begin{"+thm+"}":
+                w=w+convertbeginthm(thm,label)
+            elif tcontrol[i].find("\\nbegin{"+thm+"}") != -1:
+                thmname=cb.split(tcontrol[i])[3]
+                w=w+convertbeginnamedthm(thmname,thm,label)
+        if labelused and label != "":
             w += ttext[i+1]
             i += 1
+            convertlab(tcontrol[i])
+        w += ttext[i+1]
+        i += 1
 
-        return processfontstyle(w)
+    return processfontstyle(w)
 
-def processfontstyle(w) :
+def processfontstyle(w):
 
         close = dict()
         ww = ""
@@ -632,7 +622,7 @@ def processfontstyle(w) :
         return ww
     
 
-def convertref(m) :
+def convertref(m):
     global ref
     
     p=re.compile("\\\\ref\s*\\{.*?}|\\\\eqref\s*\\{.*?}")
@@ -641,13 +631,13 @@ def convertref(m) :
     M=p.findall(m)
 
     w = T[0]
-    for i in range(len(M)) :
+    for i in range(len(M)):
         t=M[i]
         lab=cb.split(t)[1]
         lab=lab.replace(":", "")
-        if t.find("\\eqref") != -1 :
+        if t.find("\\eqref") != -1:
            w=w+"<a href=\"#"+lab+"\">("+str(ref[lab])+")</a>"
-        else :
+        else:
            w=w+"<a href=\"#"+lab+"\">"+str(ref[lab])+"</a>"
         w=w+T[i+1]
     return w
@@ -755,7 +745,7 @@ s = convertref(s)
 
 
 
-if HTML :
+if HTML:
     s="<head><style>body{max-width:55em;}a:link{color:#4444aa;}a:visited{color:#4444aa;}a:hover{background-color:#aaaaFF;}</style></head><body>"+s+"</body></html>"
 
 s = s.replace("<p>", "\n<p>\n")
