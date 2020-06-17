@@ -105,6 +105,8 @@ cb = re.compile("\\{|}")
 
 
 def extractbody(m):
+    global labelpre
+    
     begin = re.compile("\\\\begin\s*")
     m = begin.sub("\\\\begin",m)
     end = re.compile("\\\\end\s*")
@@ -117,6 +119,12 @@ def extractbody(m):
         m = parse[0]
     else:
         m = parse[1]
+
+    """
+      Looks for \labelpre before begin document, or in body if no begin document, to prepend all labels
+    """
+    labelpreobj = re.search(r"\\labelpre\s*\{(.*?)}", parse[0])
+    labelpre = labelpreobj.group(1) if labelpreobj else ""
 
     """
       removes comments, replaces double returns with <p> and
@@ -342,7 +350,7 @@ def processmath(M):
 
                 mcell = "<td style=\"border:none;text-align:center\">"+m+"</td>"
                 numcell = "<td style=\"width:0;white-space:nowrap;border:none;text-align:right;font-style:normal;padding-left:5px\">("+str(count["equation"])+")</td>"
-                m = "\n<table id=\"" + lab + "\" style=\"width:100%;border:none\"><tr>" + mcell + numcell + "</tr></table>\n"
+                m = "\n<table id=\"" + labelpre + lab + "\" style=\"width:100%;border:none\"><tr>" + mcell + numcell + "</tr></table>\n"
             else:
                 m = "<p align=center>"+m+"</p>\n"
 
@@ -388,7 +396,7 @@ def convertbeginnamedthm(thname, thm, thmlabel):
     if thmlabel == "":
         t = t.replace("_ThmLabel_", "")
     else:
-        t = t.replace("_ThmLabel_", " id=\""+thmlabel+"\"")
+        t = t.replace("_ThmLabel_", " id=\""+labelpre+thmlabel+"\"")
     return t
 
 
@@ -404,7 +412,7 @@ def convertbeginthm(thm, thmlabel):
     if thmlabel == "":
         t = t.replace("_ThmLabel_", "")
     else:
-        t = t.replace("_ThmLabel_", " id=\""+thmlabel+"\"")
+        t = t.replace("_ThmLabel_", " id=\""+labelpre+thmlabel+"\"")
     return t
 
 
@@ -428,7 +436,7 @@ def convertlab(m):
         ref[m] = itemno
     else:
         ref[m] = count["section"]
-    return "<a name=\""+m+"\"></a>"
+    return "<a name=\""+labelpre+m+"\"></a>"
 
 
 def convertproof(m):
@@ -467,7 +475,7 @@ def convertsection(m, label):
       if label == "":
           t = t.replace("_SecLabel_", "")
       else:
-          t = t.replace("_SecLabel_", " id=\""+label+"\"")
+          t = t.replace("_SecLabel_", " id=\""+labelpre+label+"\"")
       return t
 
 def convertsubsection(m, label):
@@ -488,7 +496,7 @@ def convertsubsection(m, label):
     if label == "":
         t = t.replace("_SecLabel_", "")
     else:
-        t = t.replace("_SecLabel_", " id=\""+label+"\"")
+        t = t.replace("_SecLabel_", " id=\""+labelpre+label+"\"")
     return t
 
 
@@ -645,9 +653,9 @@ def convertref(m):
         lab=cb.split(t)[1]
         lab=lab.replace(":", "")
         if t.find("\\eqref") != -1:
-           w=w+"<a href=\"#"+lab+"\">("+str(ref[lab])+")</a>"
+           w=w+"<a href=\"#"+labelpre+lab+"\">("+str(ref[lab])+")</a>"
         else:
-           w=w+"<a href=\"#"+lab+"\">"+str(ref[lab])+"</a>"
+           w=w+"<a href=\"#"+labelpre+lab+"\">"+str(ref[lab])+"</a>"
         w=w+T[i+1]
     return w
 
@@ -658,7 +666,8 @@ In a first clean-up, all text before \begin{document}
 and after \end{document}, if present, is removed,
 all double-returns are converted
 to <p>, and all remaining returns are converted to
-spaces.
+spaces. If \labelpre command is present before begin{document},
+this used to prepend all labels
 
 The second step implements a few simple macros. The user can
 add support for more macros if desired by editing the
