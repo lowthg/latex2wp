@@ -189,8 +189,8 @@ def convertsqb(m):
     for i in range(0, len(Lthms)):
       s = Lthms[i]
       s = s.replace("\\begin", "\\nbegin")
-      s = s.replace("[", "{")
-      s = s.replace("]", "}")
+      s = s.replace("[", "__{")
+      s = s.replace("]", "__}")
       m = m+s+Lrest[i+1]
 
     return m
@@ -514,7 +514,7 @@ def processtext(t):
     global labelused
         
     p = re.compile(r"\\begin\{\w+}"
-                   r"|\\nbegin\{\w+}\s*\{.*?}"
+                   r"|\\nbegin\{\w+}\s*__\{.*?__}"
                    r"|\\end\{\w+}"
                    r"|\\item"
                    r"|\\nitem\s*\{.*?}"
@@ -561,9 +561,9 @@ def processtext(t):
         elif tcontrol[i].find("\\href") != -1:
             w = w+converturl(tcontrol[i])
         elif tcontrol[i].find("{proof}") != -1:
-            pfname=cb.split(tcontrol[i])
-            if len(pfname) > 3:
-                w = w+convertnamedproof(tcontrol[i], pfname[3])
+            if tcontrol[i].startswith("\\n"):
+                pfname = re.split("__\\}|__\\{", tcontrol[i])[1]
+                w = w+convertnamedproof(tcontrol[i], pfname)
             else:
                 w = w+convertproof(tcontrol[i])
         elif tcontrol[i].find("\\subsection") != -1:
@@ -591,7 +591,7 @@ def processtext(t):
             elif tcontrol[i]=="\\begin{"+thm+"}":
                 w=w+convertbeginthm(thm,label)
             elif tcontrol[i].find("\\nbegin{"+thm+"}") != -1:
-                thmname=cb.split(tcontrol[i])[3]
+                thmname = re.split("__\\}|__\\{", tcontrol[i])[1]
                 w=w+convertbeginnamedthm(thmname,thm,label)
         if labelused and label != "":
             w += ttext[i+1]
