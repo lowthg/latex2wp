@@ -16,6 +16,7 @@
 \setlength{\parskip}{5px}
 
 \input{macrosblog}
+\labelpre{example_}
 
 \begin{document}
 
@@ -88,7 +89,7 @@ It is possible to refer to equations and
 theorems via the {\em ref}, {\em eqref} and {\em label} LaTeX
 commands, for example to Equation (\ref{eq:test}),
 to Equation \eqref{eq:lemma},
-and to Lemma \ref{lm:main} above.
+and to Lemma \ref{lm:main} above. The `labelpre' command can optionally be used in the preamble in order to prepend all internal html tags by the specified string. This can help to avoid clashes of identical tags when multiple posts are shown on the same page. The html rendering of this document will start all anchor tags with `example\_'.
 
 eqnarray* is supported, but not eqnarray:
 
@@ -98,6 +99,16 @@ f(x) & <  & x^2 - y^2\\
 & = & (x+y) \cdot (x-y)
 \end{eqnarray*}
 
+For multiline equations, the `aligned' environment in math mode works well,
+
+$$
+\begin{aligned}
+\sum_{n=1}^\infty\frac{1}{n(n+1)} &=\sum_{n=1}^\infty\left(\frac1n-\frac1{n+1}\right)\\
+&=1-\frac12+\frac12-\frac13+\frac13-\frac14+\cdots\\
+&=1.
+\end{aligned}
+$$
+
 {\em You {\bf can} nest a {\bf bold} text inside an emphasized
 text or viceversa.}
 
@@ -106,6 +117,10 @@ text or viceversa.}
 The theorem-like environments {\em theorem}, {\em lemma},
 {\em proposition}, {\em remark}, {\em corollary}, {\em example}
 and {\em exercise} are defined, as is the {\em proof} environment.
+
+An optional argument can be used for the proof environment, so it does not need to directly follow the statement of the result.
+
+\begin{proof}[of Lemma \ref{lm:main}] By inspection. \end{proof}
 
 The LaTex commands to type \$, \%, and \&\ are supported outside
 math mode, and \%\ and \&\ are supported in math mode as well:
