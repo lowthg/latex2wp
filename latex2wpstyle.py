@@ -68,10 +68,10 @@ beginproof = "<em>Proof:</em> "
 beginnamedproof = "<em>Proof _PfName_:</em> "
 endproof = "&#x2b1c;\n\n"
 
-section = "\n<p>\n<h3_SecLabel_>_SecNumb_. _SecName_ </h3>\n<p>\n"
-sectionstar = "\n<p>\n<h3_SecLabel_> _SecName_ </h3>\n<p>\n"
-subsection = "\n<p>\n<h4_SecLabel_>  _SecNumb_._SubSecNumb_. _SecName_ </h4>\n<p>\n"
-subsectionstar = "\n<p>\n<h4_SecLabel_> _SecName_ </h4>\n<p>\n"
+section = "\n<p>\n<hr>\n<h3_SecLabel_>_SecNumb_. _SecName_ </h3>\n<p>\n"
+sectionstar = "\n<p>\n<hr>\n<h3_SecLabel_> _SecName_ </h3>\n<p>\n"
+subsection = "\n<p>\n<hr>\n<h4_SecLabel_>  _SecNumb_._SubSecNumb_. _SecName_ </h4>\n<p>\n"
+subsectionstar = "\n<p>\n<hr>\n<h4_SecLabel_> _SecName_ </h4>\n<p>\n"
 
 # Font styles. Feel free to add others. The key *must* contain
 # an open curly bracket. The value is the namem of a HTML tag.
