@@ -502,12 +502,11 @@ def convertsubsection(m, label):
 
 def converturl(m):
     L = cb.split(m)
-    return "<a href=\""+L[1]+"\">"+L[3]+"</a>"
+    return "<a href=\"" + L[1].replace("\\broot", "") + "\">" + L[3] + "</a>"
 
 def converturlnosnap(m):
     L = cb.split(m)
-    return "<a class=\"snap_noshots\" href=\""+L[1]+"\">"+L[3]+"</a>"
-
+    return "<a class=\"snap_noshots\" href=\"" + L[1].replace("\\broot", "") + "\">" + L[3] + "</a>"
 
 def convertimage(m):
     L = cb.split(m)

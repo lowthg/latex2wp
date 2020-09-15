@@ -24,6 +24,7 @@ Look at the document source to see how to \sout{strike out} text, how
 to \begin{red}use\end{red} \begin{green}different\end{green} \begin{blue}colors\end{blue},
 and how to \href{http://www.google.com}{link to URLs with snapshot preview}
 and how to \hrefnosnap{http://www.google.com}{link to URLs without snapshot preview}.
+If `\textbackslash broot' is defined in the latex header, then it can be included in the URL, and is removed in the html output. This allows a relative link to be used \href{\broot/mypage}{like this}, and have it correctly include the full URL in the latex generated output.
 
 
 There is a command which is ignored by pdflatex and which 
