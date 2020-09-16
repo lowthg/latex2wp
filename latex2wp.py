@@ -349,11 +349,11 @@ def processmath(M):
                 ref[lab] = count["equation"]
                 m = mnolab[0]+mnolab[1]
 
-                mcell = "<td style=\"border:none;text-align:center\">"+m+"</td>"
+                mcell = "<td " + eqtdstyle + ">"+m+"</td>"
                 numcell = "<td style=\"width:0;white-space:nowrap;border:none;text-align:right;font-style:normal;padding-left:5px\">("+str(count["equation"])+")</td>"
-                m = "\n<table id=\"" + labelpre + lab + "\" style=\"width:100%;border:none\"><tr>" + mcell + numcell + "</tr></table>\n"
+                m = "\n<table id=\"" + labelpre + lab + "\" " + eqtblstyle + "><tr>" + mcell + numcell + "</tr></table>\n"
             else:
-                m = "\n<table style=\"width:100%;border:none\"><tr><td style=\"border:none;text-align:center\">" + m + "</td></tr></table>\n"
+                m = "\n<table " + eqtblstyle + "><tr><td " + eqtdstyle + ">" + m + "</td></tr></table>\n"
 
         R = R + [m]
     return R
@@ -368,20 +368,19 @@ def convertcolors(m, c):
 
 def convertitm(m):
     if m.find("begin") != -1:
-        return "\n\n<ul>"
+        return "\n<ul>"
     else:
-        return "\n</ul>\n\n"
+        return "</ul>\n"
 
 def convertenum(m):
-  
     global itemno
     
     if m.find("begin") != -1:
         itemno = 0
-        return "\n\n<ol>"
+        return "\n<ol>"
     else:
         itemno = -1
-        return "\n</ol>\n\n"
+        return "</ol>\n"
 
 
 def convertbeginnamedthm(thname, thm, thmlabel):
@@ -545,7 +544,7 @@ def processtext(t):
     w = ttext[0]
 
     i = 0
-    inthm = False # set to true if command is followed by label command. Label should be processed at the same time
+    isinthm = False # set to true if command is followed by label command. Label should be processed at the same time
     while i < len(tcontrol):
         if (i+1 < len(tcontrol)) and (tcontrol[i+1].find(r"\label") != -1):
             label = cb.split(tcontrol[i+1])[1]
@@ -554,9 +553,15 @@ def processtext(t):
             label = ""
         labelused = False
         if tcontrol[i].find("{itemize}") != -1:
-            w=w+convertitm(tcontrol[i])
+            converted = convertitm(tcontrol[i])
+            if isinthm:
+                converted = endthmblock + converted + beginthmblock
+            w = w + converted
         elif tcontrol[i].find("{enumerate}") != -1:
-            w= w+convertenum(tcontrol[i])
+            converted = convertenum(tcontrol[i])
+            if isinthm:
+                converted = endthmblock + converted + beginthmblock
+            w = w + converted
         elif tcontrol[i][0:5]=="\\item":
             w=w+"<li>"
             if itemno != -1:
@@ -596,26 +601,28 @@ def processtext(t):
           for thm in ThmEnvs:
             if tcontrol[i]=="\\end{"+thm+"}":
                 w=w+convertendthm(thm)
-                if not inthm:
+                if not isinthm:
                     raise Exception("Theorem ended without begin")
-                inthm = False
+                isinthm = False
             elif tcontrol[i]=="\\begin{"+thm+"}":
                 w=w+convertbeginthm(thm,label)
-                if inthm:
+                if isinthm:
                     raise Exception("Theorem inside theorem")
-                inthm = True
+                isinthm = True
             elif tcontrol[i].find("\\nbegin{"+thm+"}") != -1:
                 thmname = re.split("__\\}|__\\{", tcontrol[i])[1]
                 w=w+convertbeginnamedthm(thmname,thm,label)
-                if inthm:
+                if isinthm:
                     raise Exception("Theorem inside theorem")
-                inthm = True
+                isinthm = True
         if labelused and label != "":
             w += ttext[i+1]
             i += 1
             convertlab(tcontrol[i])
-        if inthm:
+        if isinthm:
             ttext[i+1] = ttext[i+1].replace("_newparagraph_", endthmblock + "_newparagraph_" + beginthmblock)
+            ttext[i+1] = ttext[i+1].replace("__bmath", endthmblock + "__bmath")
+            ttext[i+1] = ttext[i+1].replace("__emath", "__emath" + beginthmblock)
         w += ttext[i+1]
         i += 1
 
@@ -750,7 +757,7 @@ s = convertmacros(s)
 
 s = text[0]
 for i in range(len(math)):
-    s = s+"__math"+str(i)+"__"+text[i+1]
+    s = s+"__bmath"+str(i)+"__emath"+text[i+1]
 
 s = processtext(s)
 math = processmath(math)
@@ -767,7 +774,7 @@ for e in esc:
 # puts the math equations back into the text
 
 for i in range(len(math)):
-    s = s.replace("__math"+str(i)+"__",math[i])
+    s = s.replace("__bmath"+str(i)+"__emath",math[i])
 
 # translating the \ref{} commands
 s = convertref(s)
@@ -779,6 +786,7 @@ if HTML:
 
 
 s = s.replace("_newparagraph_", "</p>\n<p>")
+s = s.replace("<i> </i>", " ")
 
 
 f=open(outputfile, "w")
