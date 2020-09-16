@@ -136,9 +136,10 @@ def extractbody(m):
 
     comments = re.compile("%.*?\n")
     m = comments.sub(" ", m)
+    m = "<p>" + m.strip() + "</p>" # remove leading and trailing whitespace, and enclose in paragraph
 
     multiplereturns = re.compile("\n\n+")
-    m = multiplereturns.sub("<p>", m)
+    m = multiplereturns.sub("_newparagraph_", m)
     spaces = re.compile("(\n|[ ])+")
     m = spaces.sub(" ", m)
 
@@ -352,7 +353,7 @@ def processmath(M):
                 numcell = "<td style=\"width:0;white-space:nowrap;border:none;text-align:right;font-style:normal;padding-left:5px\">("+str(count["equation"])+")</td>"
                 m = "\n<table id=\"" + labelpre + lab + "\" style=\"width:100%;border:none\"><tr>" + mcell + numcell + "</tr></table>\n"
             else:
-                m = "<div style=\"text-align:center\">"+m+"</div>\n"
+                m = "\n<table style=\"width:100%;border:none\"><tr><td style=\"border:none;text-align:center\">" + m + "</td></tr></table>\n"
 
         R = R + [m]
     return R
@@ -510,7 +511,7 @@ def converturlnosnap(m):
 
 def convertimage(m):
     L = cb.split(m)
-    return "<div style=\"text-align:center\"><img "+L[1]+" src=\""+L[3]+"\"></div>"
+    return "<span style=\"text-align:center\"><img "+L[1]+" src=\""+L[3]+"\"></span>"
 
 def convertstrike(m):
     L = cb.split(m)
@@ -544,6 +545,7 @@ def processtext(t):
     w = ttext[0]
 
     i = 0
+    inthm = False # set to true if command is followed by label command. Label should be processed at the same time
     while i < len(tcontrol):
         if (i+1 < len(tcontrol)) and (tcontrol[i+1].find(r"\label") != -1):
             label = cb.split(tcontrol[i+1])[1]
@@ -592,18 +594,28 @@ def processtext(t):
             if tcontrol[i].find("{"+clr+"}") != -1:
                 w=w + convertcolors(tcontrol[i],clr)
           for thm in ThmEnvs:
-            beginthm = False
             if tcontrol[i]=="\\end{"+thm+"}":
                 w=w+convertendthm(thm)
+                if not inthm:
+                    raise Exception("Theorem ended without begin")
+                inthm = False
             elif tcontrol[i]=="\\begin{"+thm+"}":
                 w=w+convertbeginthm(thm,label)
+                if inthm:
+                    raise Exception("Theorem inside theorem")
+                inthm = True
             elif tcontrol[i].find("\\nbegin{"+thm+"}") != -1:
                 thmname = re.split("__\\}|__\\{", tcontrol[i])[1]
                 w=w+convertbeginnamedthm(thmname,thm,label)
+                if inthm:
+                    raise Exception("Theorem inside theorem")
+                inthm = True
         if labelused and label != "":
             w += ttext[i+1]
             i += 1
             convertlab(tcontrol[i])
+        if inthm:
+            ttext[i+1] = ttext[i+1].replace("_newparagraph_", endthmblock + "_newparagraph_" + beginthmblock)
         w += ttext[i+1]
         i += 1
 
@@ -766,7 +778,7 @@ if HTML:
     s="<head><style>body{max-width:55em;}a:link{color:#4444aa;}a:visited{color:#4444aa;}a:hover{background-color:#aaaaFF;}</style></head><body>"+s+"</body></html>"
 
 
-s = s.replace("<p>", "\n<p>\n")
+s = s.replace("_newparagraph_", "</p>\n<p>")
 
 
 f=open(outputfile, "w")

@@ -53,12 +53,15 @@ ThmEnvs = ["theorem","definition","lemma","proposition","corollary","claim",
 # the string _ThmType_ stands for the type of theorem
 # the string _ThmNumb_ is the theorem number
 # the string _ThmLabel_ is replaced by "" or "id=.."
+# beginthmblock and endthmblock are used to end and start new paragraphs inside the thm environment
 beginthm = "\n<blockquote_ThmLabel_ style=\"margin-right:0px;font-style:normal\"><b>_ThmType_ _ThmNumb_</b> <i>"
 
 # translation of \begin{theorem}[...]. The string
 # _ThmName_ stands for the content betwee the
 # square brackets
 beginnamedthm = "\n<blockquote_ThmLabel_ style=\"margin-right:0;font-style:normal\"><b>_ThmType_ _ThmNumb_ (_ThmName_)</b> <i>"
+endthmblock = "</i>"
+beginthmblock = "<i>"
 
 #translation of \end{theorem}, \end{lemma}, etc.
 endthm = "</i></blockquote>\n<p>\n"
