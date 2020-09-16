@@ -352,7 +352,7 @@ def processmath(M):
                 numcell = "<td style=\"width:0;white-space:nowrap;border:none;text-align:right;font-style:normal;padding-left:5px\">("+str(count["equation"])+")</td>"
                 m = "\n<table id=\"" + labelpre + lab + "\" style=\"width:100%;border:none\"><tr>" + mcell + numcell + "</tr></table>\n"
             else:
-                m = "<p align=center>"+m+"</p>\n"
+                m = "<div style=\"text-align:center\">"+m+"</div>\n"
 
         R = R + [m]
     return R
@@ -510,7 +510,7 @@ def converturlnosnap(m):
 
 def convertimage(m):
     L = cb.split(m)
-    return "<p align=center><img "+L[1]+" src=\""+L[3]+"\"></p>"
+    return "<div style=\"text-align:center\"><img "+L[1]+" src=\""+L[3]+"\"></div>"
 
 def convertstrike(m):
     L = cb.split(m)
@@ -584,9 +584,9 @@ def processtext(t):
         elif tcontrol[i].find("\\sout") != -1:
             w = w+convertstrike(tcontrol[i])
         elif tcontrol[i].find("\\begin") !=-1 and tcontrol[i].find("{center}")!= -1:
-            w = w+"<p align=center>"
+            w = w+"<div style=\"text-align:center\">"
         elif tcontrol[i].find("\\end")!= -1  and tcontrol[i].find("{center}") != -1:
-            w = w+"</p>"
+            w = w+"</div>"
         else:
           for clr in colorchoice:
             if tcontrol[i].find("{"+clr+"}") != -1:
@@ -764,6 +764,7 @@ s = convertref(s)
 
 if HTML:
     s="<head><style>body{max-width:55em;}a:link{color:#4444aa;}a:visited{color:#4444aa;}a:hover{background-color:#aaaaFF;}</style></head><body>"+s+"</body></html>"
+
 
 s = s.replace("<p>", "\n<p>\n")
 
