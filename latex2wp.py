@@ -563,13 +563,19 @@ def processtext(t):
                 converted = endthmblock + converted + beginthmblock
             w = w + converted
         elif tcontrol[i][0:5]=="\\item":
-            w=w+"<li>"
+            if isinthm:
+                w = w + endthmblock + "<li>" + beginthmblock
+            else:
+                w=w + "<li>"
             if itemno != -1:
                 itemno=itemno+1
         elif tcontrol[i][0:6]=="\\nitem":
                 lb = tcontrol[i][7:].replace("{", "")
                 lb = lb.replace("}", "")
-                w=w+"<li>"+lb
+                if isinthm:
+                    w = w + endthmblock + "<li>" + lb + beginthmblock
+                else:
+                    w=w + "<li>" + lb
         elif tcontrol[i].find("\\hrefnosnap") != -1:
             w = w+converturlnosnap(tcontrol[i])
         elif tcontrol[i].find("\\href") != -1:

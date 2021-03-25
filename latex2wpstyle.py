@@ -63,6 +63,7 @@ beginnamedthm = "\n<blockquote_ThmLabel_ style=\"margin-right:0;font-style:norma
 endthmblock = "</i>"
 beginthmblock = "<i>"
 
+
 #translation of \end{theorem}, \end{lemma}, etc.
 endthm = "</i></blockquote>\n<p>\n"
 
