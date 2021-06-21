@@ -57,8 +57,11 @@ labelused = False
 esc = [["\\$", "_dollar_", "&#36;", "\\$"],
        ["\\%", "_percent_", "&#37;", "\\%"],
        ["\\&", "_amp_", "&amp;", "\\&"],
+       ["\\>", "_greaterthan_", "&gt;", "&gt;"],
+       ["\\<", "_lessthan_", "&lt;", "&lt;"],
        [">", "_greater_", ">", "&gt;"],
        ["<", "_lesser_", "<", "&lt;"],
+       ["\_", "_underscore_", "_", "\\_"],
        ["\enspace", "_ensp_", "&ensp;", "&ensp;"]]
 
 M = M + [["\\more", "<!--more-->"],

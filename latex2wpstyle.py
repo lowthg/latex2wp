@@ -115,6 +115,7 @@ M = [     ["\\to","\\rightarrow"] ,
           ["\\R","{\\mathbb R}"],
           ["\\Q","{\\mathbb Q}"],
           ["\\xor","\\oplus"],
-          ["\\eps","\\epsilon"]
+          ["\\eps","\\epsilon"],
+          ["\\<","&lt;"],
     ]
 
