@@ -286,6 +286,7 @@ def convertonetable(m):
 def separatemath(m):
     mathre = re.compile("\\$.*?\\$"
                         "|\\\\begin\\{equation}.*?\\\\end\\{equation}"
+                        "|\\\\begin\\{html}.*?\\\\end\\{html}"
                         "|\\\\\\[.*?\\\\\\]")
     math = mathre.findall(m)
     text = mathre.split(m)
@@ -300,6 +301,8 @@ def processmath(M):
     mathdelim = re.compile("\\$"
                            "|\\\\begin\\{equation}"
                            "|\\\\end\\{equation}"
+                           "|\\\\begin\\{html}"
+                           "|\\\\end\\{html}"
                            "|\\\\\\[|\\\\\\]")
     label = re.compile("\\\\label\\{.*?}")
     
@@ -312,6 +315,8 @@ def processmath(M):
           which is either \begin{equation}, or $, or \[, and
           mb[1] contains the actual mathematical equation
         """
+
+        ishtml = False
         
         if md[0] == "$":
             if HTML:
@@ -328,14 +333,18 @@ def processmath(M):
             #if md[0].find("\\begin") != -1:
             #   count["equation"] += 1
             #   mb[1] = mb[1] + "\\ \\ \\ \\ \\ ("+str(count["equation"])+")"
-            if HTML:
-                mb[1] = mb[1].replace("+", "%2B")
-                mb[1] = mb[1].replace("&", "%26")
-                mb[1] = mb[1].replace(" ", "+")
-                mb[1] = mb[1].replace("'", "&#39;")
-                m = "<img src=\"http://l.wordpress.com/latex.php?latex=\displaystyle "+mb[1]+endlatex+"\">"
+            if md[0].find("html") != -1:
+                m = mb[1]
+                ishtml = True	
             else:
-                m = "$latex \displaystyle "+mb[1]+endlatex+"$"
+                if HTML:
+                    mb[1] = mb[1].replace("+", "%2B")
+                    mb[1] = mb[1].replace("&", "%26")
+                    mb[1] = mb[1].replace(" ", "+")
+                    mb[1] = mb[1].replace("'", "&#39;")
+                    m = "<img src=\"http://l.wordpress.com/latex.php?latex=\displaystyle "+mb[1]+endlatex+"\">"
+                else:
+                    m = "$latex \displaystyle "+mb[1]+endlatex+"$"
             if m.find("\\label") != -1:
                 mnolab = label.split(m)
                 mlab = label.findall(m)
@@ -353,12 +362,19 @@ def processmath(M):
                 m = mnolab[0]+mnolab[1]
 
                 mcell = "<td " + eqtdstyle + ">"+m+"</td>"
-                numcell = "<td style=\"width:0;white-space:nowrap;border:none;text-align:right;font-style:normal;padding-left:5px\">("+str(count["equation"])+")</td>"
+                numcell = "<td style=\"width:0;white-space:nowrap;border:none;text-align:right;font-style:normal;padding-left:5px;\">("+str(count["equation"])+")</td>"
                 m = "\n<table id=\"" + labelpre + lab + "\" " + eqtblstyle + "><tr>" + mcell + numcell + "</tr></table>\n"
             else:
                 m = "\n<table " + eqtblstyle + "><tr><td " + eqtdstyle + ">" + m + "</td></tr></table>\n"
 
+        for e in esc:
+            if ishtml:
+                m = m.replace(e[1],e[2])
+            else:
+                m = m.replace(e[1],e[3])
+
         R = R + [m]
+
     return R
 
 
@@ -777,8 +793,6 @@ math = processmath(math)
 
 for e in esc:
     s = s.replace(e[1],e[2])
-    for i in range(len(math)):
-        math[i] = math[i].replace(e[1],e[3])
 
 # puts the math equations back into the text
 
