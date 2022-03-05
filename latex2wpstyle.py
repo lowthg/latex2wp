@@ -117,5 +117,6 @@ M = [     ["\\to","\\rightarrow"] ,
           ["\\xor","\\oplus"],
           ["\\eps","\\epsilon"],
           ["\\<","&lt;"],
+          ["\\dart","&#x27A2;"]
     ]
 
