@@ -362,7 +362,7 @@ def processmath(M):
                 m = mnolab[0]+mnolab[1]
 
                 mcell = "<td " + eqtdstyle + ">"+m+"</td>"
-                numcell = "<td style=\"width:0;white-space:nowrap;border:none;text-align:right;font-style:normal;padding-left:5px;\">("+str(count["equation"])+")</td>"
+                numcell = "<td style=\"width:40px;white-space:nowrap;border:none;text-align:right;font-style:normal;padding:0;\">("+str(count["equation"])+")</td>"
                 m = "\n<table id=\"" + labelpre + lab + "\" " + eqtblstyle + "><tr>" + mcell + numcell + "</tr></table>\n"
             else:
                 m = "\n<table " + eqtblstyle + "><tr><td " + eqtdstyle + ">" + m + "</td></tr></table>\n"
