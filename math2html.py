@@ -2,6 +2,9 @@
 math2html - convert simple latex math expressions to html code
 """
 
+import webbrowser
+import os
+
 _math2html_map = {
     '+':    '&nbsp;+&nbsp;',
     '-':    '&nbsp;-&nbsp;',
@@ -11,6 +14,12 @@ _math2html_map = {
     '<':    '&nbsp;&lt;&nbsp;'
 }
 
+_math2html_unary = {
+    '+':    '+',
+    '-':    '-',
+    '=':    '=&nbsp;',
+    '<':    '&lt;&nbsp;'
+}
 
 def math2html(expr: str):
     result, i, style = math2html_inner(expr, 0)
@@ -35,11 +44,28 @@ def parse_arg(expr: str, i: int) -> (str, int):
     return result, i
 
 
+def parse_command(expr: str, i: int) -> (str, int):
+    """
+    parse command following backslash
+    """
+    result = expr[i]
+    i += 1
+    while i < len(expr):
+        x = expr[i]
+        if 'a' <= x <= 'z' or 'A' <= x <= 'Z':
+            i += 1
+            result += x
+        else:
+            break
+    return result, i
+
+
 def math2html_inner(expr: str, i: int, paren_depth: int = 0, single: bool = False) -> (str, int, str):
     result = ''
     in_italic = False
     brace_depth = 0
     style = ''
+    binary = False
 
     while i < len(expr):
         x = expr[i]
@@ -54,8 +80,10 @@ def math2html_inner(expr: str, i: int, paren_depth: int = 0, single: bool = Fals
             term = x
             if x == '(':
                 paren_depth += 1
+                binary = False
             else:
                 paren_depth -= 1
+                binary = True
         elif x == '{':
             term = ''
             brace_depth += 1
@@ -65,6 +93,7 @@ def math2html_inner(expr: str, i: int, paren_depth: int = 0, single: bool = Fals
             assert brace_depth >= 0
         elif x == '_' or x == '^':
             italic = False
+            binary = True
             tag = 'sub' if x == '_' else 'sup'
             term, i, temp = math2html_inner(expr, i, paren_depth + 1, True)
             if temp == '':
@@ -75,34 +104,41 @@ def math2html_inner(expr: str, i: int, paren_depth: int = 0, single: bool = Fals
         elif 'A' <= x <= 'Z' or 'a' <= x <= 'z':
             italic = True
             term = x
+            binary = True
         elif '0' <= x <= '9':
             term = x
             italic = False
+            binary = True
         elif x == '\\':
-            if expr[i:].startswith('style{'):
-                i += 5
+            command, i = parse_command(expr, i)
+            if command == 'style':
                 temp, i = parse_arg(expr, i)
                 if style != '' and temp != ';':
                     style += ';'
                 style += temp
-            elif expr[i:].startswith('pos{'):
-                i += 3
+                continue
+            elif command == 'pos':
                 temp, i = parse_arg(expr, i)
                 if temp != '':
                     temp = 'position:relative;left:{}em'.format(temp)
                     if style != '':
                         style += ';'
                     style += temp
-            elif expr[i:].startswith('le'):
-                i += 2
+                continue
+            elif command == 'le':
                 term = '&nbsp;&leq;&nbsp;'
                 italic = False
+                binary = False
             else:
-                raise Exception('Unknown command {}'.format(expr[i-1:]))
+                raise Exception('Unknown command {}'.format(command))
         else:
-            if x not in _math2html_map:
+            if not binary and x in _math2html_unary:
+                term = _math2html_unary[x]
+            elif x in _math2html_map:
+                term = _math2html_map[x]
+                binary = False
+            else:
                 raise Exception('{} not in map'.format(x))
-            term = _math2html_map[x]
             italic = False
 
         if not in_italic and italic:
@@ -124,9 +160,16 @@ def math2html_inner(expr: str, i: int, paren_depth: int = 0, single: bool = Fals
 
 
 if __name__ == "__main__":
-    print(math2html("F(a)+1"))
-    print(math2html("s_i(a+1)"))
-    print(math2html("s_{i-1},s_i,s_{i+1}"))
-    print(math2html("s'_{\pos{-0.4}i}"))
-    print(math2html("2^8=256"))
-    print(math2html("0\le i < 200"))
+    html = "<html><body>"
+    for code in [
+        "s_i(a+1),s_i,s'_{\\pos{-0.4}i+1}",
+        "2^8=256",
+        "0\\le i < 200",
+        "s_{-1}"
+    ]:
+        htmleq = math2html(code)
+        print(htmleq)
+        html += "<p>" + htmleq + "</p>"
+    with open("testmath.html", "w") as f:
+        f.write(html)
+    webbrowser.open("file://" + os.path.abspath(os.getcwd()) + "/testmath.html", new=2)
