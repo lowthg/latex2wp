@@ -108,6 +108,11 @@ cb = re.compile("\\{|}")
 
 
 def extract_body(m):
+    """
+      extract_body() takes the text between a \begin{document}
+      and \end{document}, if present, (otherwise it keeps the
+      whole document), normalizes the spacing, and removes comments
+    """
     global labelpre
     
     begin = re.compile("\\\\begin\s*")
@@ -178,7 +183,10 @@ def extract_body(m):
     return m
 
 
-def convertsqb(m):
+def convert_sqb(m):
+    """
+    reformats optional parameters passed in square brackets
+    """
 
     r = re.compile("\\\\item\\s*\\[.*?\\]")
 
@@ -208,7 +216,11 @@ def convertsqb(m):
     return m
 
 
-def converttables(m):
+def convert_tables(m):
+    """
+    formats tables
+    """
+
     retable = re.compile("\\\\begin\s*\\{tabular}.*?\\\\end\s*\\{tabular}")
     tables = retable.findall(m)
     rest = retable.split(m)
@@ -221,8 +233,10 @@ def converttables(m):
     return m
 
 
-def convertmacros(m):
-
+def convert_macros(m):
+    """
+    implement simple macros
+    """
     comm = re.compile("\\\\[a-zA-Z]*")
     commands = comm.findall(m)
     rest = comm.split(m)
@@ -283,7 +297,10 @@ def convertonetable(m):
     return m
  
 
-def separatemath(m):
+def separate_math(m):
+    """
+    extracts the math parts, and replaces the with placeholders
+    """
     mathre = re.compile("\\$.*?\\$"
                         "|\\\\begin\\{equation}.*?\\\\end\\{equation}"
                         "|\\\\begin\\{html}.*?\\\\end\\{html}"
@@ -293,7 +310,7 @@ def separatemath(m):
     return math, text
 
 
-def processmath(M):
+def process_math(M):
     R = []
     counteq = 0
     global ref
@@ -319,7 +336,11 @@ def processmath(M):
         ishtml = False
         
         if md[0] == "$":
-            if HTML:
+            if mb[1].startswith('\\html'):
+                for e in esc:
+                    mb[1] = mb[1].replace(e[1], e[0])
+                m = math2html(mb[1][5:])
+            elif HTML:
                 m = m.replace("$", "")
                 m = m.replace("+", "%2B")
                 m = m.replace(" ", "+")
@@ -329,7 +350,6 @@ def processmath(M):
                 m = "$latex {"+mb[1]+"}"+endlatex+"$"
 
         else:
-          
             #if md[0].find("\\begin") != -1:
             #   count["equation"] += 1
             #   mb[1] = mb[1] + "\\ \\ \\ \\ \\ ("+str(count["equation"])+")"
@@ -536,7 +556,8 @@ def convertstrike(m):
     L = cb.split(m)
     return "<s>"+L[1]+"</s>"
 
-def processtext(t):
+
+def process_text(t):
     global itemno
     global labelused
         
@@ -744,38 +765,20 @@ and a clickable link to the referenced location.
 
 
 def text2wp(s: str) -> str:
-
-    """
-      extract_body() takes the text between a \begin{document}
-      and \end{document}, if present, (otherwise it keeps the
-      whole document), normalizes the spacing, and removes comments
-    """
     s = extract_body(s)
+    s = convert_tables(s)
+    s = convert_sqb(s)
+    s = convert_macros(s)
+    (math, text) = separate_math(s)
 
-    # formats tables
-    s = converttables(s)
-
-    # reformats optional parameters passed in square brackets
-    s = convertsqb(s)
-
-
-    #implement simple macros
-    s = convertmacros(s)
-
-
-    # extracts the math parts, and replaces the with placeholders
     # processes math and text separately, then puts the processed
     # math equations in place of the placeholders
-
-    (math, text) = separatemath(s)
-
-
     s = text[0]
     for i in range(len(math)):
         s = s+"__bmath"+str(i)+"__emath"+text[i+1]
 
-    s = processtext(s)
-    math = processmath(math)
+    s = process_text(s)
+    math = process_math(math)
 
     # converts escape sequences such as \$ to HTML codes
     # This must be done after formatting the tables or the '&' in
