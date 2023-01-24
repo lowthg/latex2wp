@@ -21,6 +21,9 @@ _math2html_unary = {
     '<':    '&lt;&nbsp;'
 }
 
+_math2html_mathbb = {
+}
+
 def math2html(expr: str):
     result, i, style = math2html_inner(expr, 0)
     assert i == len(expr)
@@ -66,6 +69,7 @@ def math2html_inner(expr: str, i: int, paren_depth: int = 0, single: bool = Fals
     brace_depth = 0
     style = ''
     binary = False
+    scopes = [{}]
 
     while i < len(expr):
         x = expr[i]
@@ -87,10 +91,12 @@ def math2html_inner(expr: str, i: int, paren_depth: int = 0, single: bool = Fals
         elif x == '{':
             term = ''
             brace_depth += 1
+            scopes.append(scopes[-1])
         elif x == '}':
             term = ''
             brace_depth -= 1
             assert brace_depth >= 0
+            scopes.pop()
         elif x == '_' or x == '^':
             italic = False
             binary = True
@@ -105,6 +111,9 @@ def math2html_inner(expr: str, i: int, paren_depth: int = 0, single: bool = Fals
             italic = True
             term = x
             binary = True
+            if 'mathbb' in scopes[-1]:
+                italic = False
+                term = '&' + x + 'opf;'
         elif '0' <= x <= '9':
             term = x
             italic = False
@@ -129,6 +138,10 @@ def math2html_inner(expr: str, i: int, paren_depth: int = 0, single: bool = Fals
                 term = '&nbsp;&leq;&nbsp;'
                 italic = False
                 binary = False
+            elif command == 'mathbb':
+                scopes[-1] = set()
+                scopes[-1].add('mathbb')
+                term = ''
             else:
                 raise Exception('Unknown command {}'.format(command))
         else:
@@ -165,7 +178,8 @@ if __name__ == "__main__":
         "s_i(a+1),s_i,s'_{\\pos{-0.4}i+1}",
         "2^8=256",
         "0\\le i < 200",
-        "s_{-1}"
+        "s_{-1}",
+        "\mathbb F"
     ]:
         htmleq = math2html(code)
         print(htmleq)
