@@ -127,13 +127,19 @@ def math2html_inner(expr: str, i: int, paren_depth: int = 0, single: bool = Fals
         elif x == '_' or x == '^':
             italic = False
             binary = True
-            tag = 'sub' if x == '_' else 'sup'
             term, i, temp = math2html_inner(expr, i, paren_depth + 1, True)
+            tag = 'sub' if x == '_' else 'sup'
+            if i < len(expr):
+                if (expr[i] == '^' or expr[i] == '_') and expr[i] != x:
+                    temp = 'display:inline-block;width:0px;' + temp
             if temp == '':
                 open = '<{}>'.format(tag)
             else:
                 open = '<{} style=\"{}\">'.format(tag, temp)
             term = open + term + '</{}>'.format(tag)
+        elif x == '\'' and i < len(expr) and expr[i] == '_':
+            italic = False
+            term = "<span style='display:inline-block;width:0px'>&prime;</span>"
         elif 'A' <= x <= 'Z' or 'a' <= x <= 'z':
             italic = True
             term = x
@@ -209,7 +215,7 @@ def math2html_inner(expr: str, i: int, paren_depth: int = 0, single: bool = Fals
 if __name__ == "__main__":
     html = "<html><body>"
     for code in [
-        "s_i(a+1),s_i,s'_{\\pos{-0.4}i+1}",
+        "s^i_{23}(a+1),s_i^{23},s'_{i+1}",
         "2^8=256",
         "0\\le i < 200",
         "Q + {\\mathbb F + H} + R_{-1}",
