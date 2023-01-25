@@ -11,7 +11,9 @@ _math2html_map = {
     '=':    '&nbsp;=&nbsp;',
     ',':    ',&thinsp;',
     '\'':   '&prime;',
-    '<':    '&nbsp;&lt;&nbsp;'
+    '<':    '&nbsp;&lt;&nbsp;',
+    '>':    '&nbsp;&gt;&nbsp;',
+    '/':    '/'
 }
 
 _math2html_unary = {
@@ -21,16 +23,38 @@ _math2html_unary = {
     '<':    '&lt;&nbsp;'
 }
 
-_math2html_mathbb = {
+_math2html_symbols = {
+    'le': '&nbsp;&leq;&nbsp;',
+    'circ': '&cir;',
+    'ldots': '&hellip;',
+    'Vert': '&Vert;'
 }
 
+_math2html_letters = {
+}
+
+for letter in ['alpha', 'beta', 'gamma', 'delta', 'epsilon', 'zeta', 'eta', 'theta', 'iota',
+               'kappa', 'lambda', 'mu', 'nu', 'xi', 'omicron', 'pi', 'rho', 'sigma', 'tau',
+               'upsilon', 'phi', 'chi', 'psi',  'omega'
+]:
+    _math2html_letters[letter] = '&' + letter + ';'
+    letter = letter[0].upper()
+    _math2html_letters[letter] = '&' + letter + ';'
+
 def math2html(expr: str):
+    """
+    The main entry point
+    convert LaTeX math expression to html
+    """
     result, i, style = math2html_inner(expr, 0)
     assert i == len(expr)
     return result
 
 
 def parse_arg(expr: str, i: int) -> (str, int):
+    """
+    get argument to command
+    """
     depth = 0
     result = ''
     while True:
@@ -64,6 +88,9 @@ def parse_command(expr: str, i: int) -> (str, int):
 
 
 def math2html_inner(expr: str, i: int, paren_depth: int = 0, single: bool = False) -> (str, int, str):
+    """
+    The main loop converting LaTeX expression to html
+    """
     result = ''
     in_italic = False
     brace_depth = 0
@@ -114,6 +141,9 @@ def math2html_inner(expr: str, i: int, paren_depth: int = 0, single: bool = Fals
             if 'mathbb' in scopes[-1]:
                 italic = False
                 term = '&' + x + 'opf;'
+            elif 'mathcal' in scopes[-1]:
+                italic = False
+                term = '&' + x + 'scr;'
         elif '0' <= x <= '9':
             term = x
             italic = False
@@ -134,13 +164,17 @@ def math2html_inner(expr: str, i: int, paren_depth: int = 0, single: bool = Fals
                         style += ';'
                     style += temp
                 continue
-            elif command == 'le':
-                term = '&nbsp;&leq;&nbsp;'
+            elif command in _math2html_symbols:
+                term = _math2html_symbols[command]
                 italic = False
                 binary = False
-            elif command == 'mathbb':
+            elif command in _math2html_letters:
+                term = _math2html_letters[command]
+                italic = True
+                binary = True
+            elif command == 'mathbb' or command == 'mathcal':
                 scopes[-1] = set()
-                scopes[-1].add('mathbb')
+                scopes[-1].add(command)
                 term = ''
             else:
                 raise Exception('Unknown command {}'.format(command))
@@ -178,8 +212,9 @@ if __name__ == "__main__":
         "s_i(a+1),s_i,s'_{\\pos{-0.4}i+1}",
         "2^8=256",
         "0\\le i < 200",
-        "s_{-1}",
-        "\mathbb F"
+        "Q + {\\mathbb F + H} + R_{-1}",
+        "2^s > \\omega/2",
+        "f_i\\circ\\omega\\Vert{\\mathcal ab}c \\lambda"
     ]:
         htmleq = math2html(code)
         print(htmleq)
