@@ -353,21 +353,10 @@ def process_math(M):
             #if md[0].find("\\begin") != -1:
             #   count["equation"] += 1
             #   mb[1] = mb[1] + "\\ \\ \\ \\ \\ ("+str(count["equation"])+")"
-            if md[0].find("html") != -1:
-                m = mb[1]
-                ishtml = True	
-            else:
-                if HTML:
-                    mb[1] = mb[1].replace("+", "%2B")
-                    mb[1] = mb[1].replace("&", "%26")
-                    mb[1] = mb[1].replace(" ", "+")
-                    mb[1] = mb[1].replace("'", "&#39;")
-                    m = "<img src=\"http://l.wordpress.com/latex.php?latex=\displaystyle "+mb[1]+endlatex+"\">"
-                else:
-                    m = "$latex \displaystyle "+mb[1]+endlatex+"$"
-            if m.find("\\label") != -1:
-                mnolab = label.split(m)
-                mlab = label.findall(m)
+            has_label = mb[1].find("\\label") != -1
+            if has_label:
+                mnolab = label.split(mb[1])
+                mlab = label.findall(mb[1])
                 """
                  Now the mathematical equation, which has already
                  been formatted for WordPress, is the union of
@@ -379,8 +368,25 @@ def process_math(M):
                 lab = lab.replace(":", "")
                 count["equation"] += 1
                 ref[lab] = count["equation"]
-                m = mnolab[0]+mnolab[1]
+                mb[1] = mnolab[0]+mnolab[1]
 
+            if md[0].find("html") != -1:
+                m = mb[1]
+                ishtml = True	
+            else:
+                if HTML:
+                    mb[1] = mb[1].replace("+", "%2B")
+                    mb[1] = mb[1].replace("&", "%26")
+                    mb[1] = mb[1].replace(" ", "+")
+                    mb[1] = mb[1].replace("'", "&#39;")
+                    m = "<img src=\"http://l.wordpress.com/latex.php?latex=\displaystyle "+mb[1]+endlatex+"\">"
+                elif mb[1].startswith('\\html'):
+                    for e in esc:
+                        mb[1] = mb[1].replace(e[1], e[0])
+                    m = math2html(mb[1][5:])
+                else:
+                    m = "$latex \displaystyle "+mb[1]+endlatex+"$"
+            if has_label:
                 mcell = "<td " + eqtdstyle + ">"+m+"</td>"
                 numcell = "<td style=\"width:40px;white-space:nowrap;border:none;text-align:right;font-style:normal;padding:0;\">("+str(count["equation"])+")</td>"
                 m = "\n<table id=\"" + labelpre + lab + "\" " + eqtblstyle + "><tr>" + mcell + numcell + "</tr></table>\n"
@@ -485,11 +491,13 @@ def convertproof(m):
     else:
         return endproof
 
+
 def convertnamedproof(m, label):
     if m.find("begin") != -1:
         return beginnamedproof.replace("_PfName_", label)
     else:
         return endproof
+
 
 def convertsection(m, label):
       global labelused
@@ -517,6 +525,7 @@ def convertsection(m, label):
       else:
           t = t.replace("_SecLabel_", " id=\""+labelpre+label+"\"")
       return t
+
 
 def convertsubsection(m, label):
     global labelused

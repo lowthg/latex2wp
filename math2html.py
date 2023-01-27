@@ -27,7 +27,8 @@ _math2html_symbols = {
     'le': '&nbsp;&leq;&nbsp;',
     'circ': '&cir;',
     'ldots': '&hellip;',
-    'Vert': '&Vert;'
+    'Vert': '&Vert;',
+    'log':  'log'
 }
 
 _math2html_letters = {
@@ -77,13 +78,14 @@ def parse_command(expr: str, i: int) -> (str, int):
     """
     result = expr[i]
     i += 1
-    while i < len(expr):
-        x = expr[i]
-        if 'a' <= x <= 'z' or 'A' <= x <= 'Z':
-            i += 1
-            result += x
-        else:
-            break
+    if 'a' <= result <= 'z' or 'A' <= result <= 'Z':
+        while i < len(expr):
+            x = expr[i]
+            if 'a' <= x <= 'z' or 'A' <= x <= 'Z':
+                i += 1
+                result += x
+            else:
+                break
     return result, i
 
 
@@ -144,19 +146,24 @@ def math2html_inner(expr: str, i: int, paren_depth: int = 0, single: bool = Fals
             italic = True
             term = x
             binary = True
+            if 'rm' in scopes[-1]:
+                italic = False
             if 'mathbb' in scopes[-1]:
                 italic = False
                 term = '&' + x + 'opf;'
             elif 'mathcal' in scopes[-1]:
                 italic = False
                 term = '&' + x + 'scr;'
-        elif '0' <= x <= '9':
+        elif '0' <= x <= '9' or x == '.':
             term = x
             italic = False
             binary = True
         elif x == '\\':
             command, i = parse_command(expr, i)
-            if command == 'style':
+            if command == ' ':
+                term = command
+                binary = False
+            elif command == 'style':
                 temp, i = parse_arg(expr, i)
                 if style != '' and temp != ';':
                     style += ';'
@@ -178,7 +185,7 @@ def math2html_inner(expr: str, i: int, paren_depth: int = 0, single: bool = Fals
                 term = _math2html_letters[command]
                 italic = True
                 binary = True
-            elif command == 'mathbb' or command == 'mathcal':
+            elif command == 'mathbb' or command == 'mathcal' or command == 'rm':
                 scopes[-1] = set()
                 scopes[-1].add(command)
                 term = ''
@@ -215,12 +222,13 @@ def math2html_inner(expr: str, i: int, paren_depth: int = 0, single: bool = Fals
 if __name__ == "__main__":
     html = "<html><body>"
     for code in [
-        "s^i_{23}(a+1),s_i^{23},s'_{i+1}",
-        "2^8=256",
-        "0\\le i < 200",
-        "Q + {\\mathbb F + H} + R_{-1}",
-        "2^s > \\omega/2",
-        "f_i\\circ\\omega\\Vert{\\mathcal ab}c \\lambda"
+        # "s^i_{23}(a+1),s_i^{23},s'_{i+1}",
+        # "2^8=256",
+        # "0\\le i < 200",
+        # "Q + {\\mathbb F + H} + R_{-1}",
+        # "2^s > \\omega/2",
+        # "f_i\\circ\\omega\\Vert{\\mathcal ab}c \\lambda",
+        "s'_i=s_{i-1}{\\rm \\ XOR\\ }(s_i{\\rm \\ OR\\ }s_{i+1})"
     ]:
         htmleq = math2html(code)
         print(htmleq)
