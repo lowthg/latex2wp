@@ -34,6 +34,8 @@ _math2html_symbols = {
 _math2html_letters = {
 }
 
+_math2html_env = {'aligned'}
+
 for letter in ['alpha', 'beta', 'gamma', 'delta', 'epsilon', 'zeta', 'eta', 'theta', 'iota',
                'kappa', 'lambda', 'mu', 'nu', 'xi', 'omicron', 'pi', 'rho', 'sigma', 'tau',
                'upsilon', 'phi', 'chi', 'psi',  'omega'
@@ -41,6 +43,7 @@ for letter in ['alpha', 'beta', 'gamma', 'delta', 'epsilon', 'zeta', 'eta', 'the
     _math2html_letters[letter] = '&' + letter + ';'
     letter = letter[0].upper()
     _math2html_letters[letter] = '&' + letter + ';'
+
 
 def math2html(expr: str):
     """
@@ -99,6 +102,7 @@ def math2html_inner(expr: str, i: int, paren_depth: int = 0, single: bool = Fals
     style = ''
     binary = False
     scopes = [{}]
+    environs = []
 
     while i < len(expr):
         x = expr[i]
@@ -106,7 +110,7 @@ def math2html_inner(expr: str, i: int, paren_depth: int = 0, single: bool = Fals
 
         italic = in_italic
 
-        if x == ' ':
+        if x == ' ' or x == '\n':
             continue
         elif x == '(' or x == ')':
             italic = False
@@ -163,6 +167,24 @@ def math2html_inner(expr: str, i: int, paren_depth: int = 0, single: bool = Fals
             if command == ' ':
                 term = command
                 binary = False
+            elif command == 'begin':
+                arg, i = parse_arg(expr, i)
+                assert arg in _math2html_env
+                environs.append(arg)
+                assert arg == 'aligned'
+                term = '<table style="border:none;margin:auto;width:0;font-size:100%">\n' + \
+                       '<tr><td style="white-space:nowrap;border:none;text-align:right;padding:0;">'
+                italic = False
+            elif command == '\\':
+                if environs[-1] == 'aligned':
+                    term = '</td></tr>\n<tr><td style="white-space:nowrap;border:none;text-align:right;padding:0;">'
+                    italic = False
+                else:
+                    term = '<br>'
+            elif command == 'end':
+                arg, i = parse_arg(expr, i)
+                assert arg == environs.pop()
+                term = '</td></tr></table>'
             elif command == 'style':
                 temp, i = parse_arg(expr, i)
                 if style != '' and temp != ';':
@@ -191,6 +213,10 @@ def math2html_inner(expr: str, i: int, paren_depth: int = 0, single: bool = Fals
                 term = ''
             else:
                 raise Exception('Unknown command {}'.format(command))
+        elif x == '&':
+            assert environs[-1] == 'aligned'
+            term = '</td><td style="white-space:nowrap;border:none;text-align:left;padding:0;">'
+            italic = False
         else:
             if not binary and x in _math2html_unary:
                 term = _math2html_unary[x]
@@ -228,7 +254,11 @@ if __name__ == "__main__":
         # "Q + {\\mathbb F + H} + R_{-1}",
         # "2^s > \\omega/2",
         # "f_i\\circ\\omega\\Vert{\\mathcal ab}c \\lambda",
-        "s'_i=s_{i-1}{\\rm \\ XOR\\ }(s_i{\\rm \\ OR\\ }s_{i+1})"
+        "s'_i=s_{i-1}{\\rm \\ XOR\\ }(s_i{\\rm \\ OR\\ }s_{i+1})",
+        "\\begin{aligned}" +
+        "& a {\\rm\\ OR\\ }b = a+b-ab, \\\\\n" +
+        "& a {\\rm\\ XOR\\ }b = a+b-2ab." +
+        "\\end{aligned}"
     ]:
         htmleq = math2html(code)
         print(htmleq)

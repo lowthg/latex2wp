@@ -78,8 +78,8 @@ subsection = "\n<p>\n<hr>\n<h4_SecLabel_>  _SecNumb_._SubSecNumb_. _SecName_ </h
 subsectionstar = "\n<p>\n<hr>\n<h4_SecLabel_> _SecName_ </h4>\n<p>\n"
 
 # styling for math table
-eqtblstyle = "style=\"width:100%;border:none;margin-top:0;margin-bottom:0\""
-eqtdstyle = "style=\"border:none;text-align:center;padding:0\""
+eqtblstyle = 'style="width:100%;border:none;margin-top:0;margin-bottom:0"'
+eqtdstyle = 'style="border:none;text-align:center;padding:0"'
 
 # Font styles. Feel free to add others. The key *must* contain
 # an open curly bracket. The value is the namem of a HTML tag.
