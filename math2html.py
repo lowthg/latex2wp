@@ -28,7 +28,8 @@ _math2html_symbols = {
     'circ': '&cir;',
     'ldots': '&hellip;',
     'Vert': '&Vert;',
-    'log':  'log'
+    'log':  'log',
+    'prod': '<span style="font-size:150%">&prod;</span>'
 }
 
 _math2html_letters = {
@@ -137,7 +138,8 @@ def math2html_inner(expr: str, i: int, paren_depth: int = 0, single: bool = Fals
             tag = 'sub' if x == '_' else 'sup'
             if i < len(expr):
                 if (expr[i] == '^' or expr[i] == '_') and expr[i] != x:
-                    temp = 'display:inline-block;width:0px;' + temp
+                    #temp = 'position:absolute;white-space:nowrap;' + temp
+                    temp = 'display:inline-block;width:0px;white-space:nowrap;' + temp
             if temp == '':
                 open = '<{}>'.format(tag)
             else:
@@ -172,7 +174,7 @@ def math2html_inner(expr: str, i: int, paren_depth: int = 0, single: bool = Fals
                 assert arg in _math2html_env
                 environs.append(arg)
                 assert arg == 'aligned'
-                term = '<table style="border:none;margin:auto;width:0;font-size:100%">\n' + \
+                term = '<table style="border:none;margin:auto;display:inline;font-size:100%">\n' + \
                        '<tr><td style="white-space:nowrap;border:none;text-align:right;padding:0;">'
                 italic = False
             elif command == '\\':
@@ -258,11 +260,15 @@ if __name__ == "__main__":
         "\\begin{aligned}" +
         "& a {\\rm\\ OR\\ }b = a+b-ab, \\\\\n" +
         "& a {\\rm\\ XOR\\ }b = a+b-2ab." +
-        "\\end{aligned}"
+        "\\end{aligned}",
+        "Z_N(X)=\\prod_{n=0}^{N-1}(X-c\\omega^n)."
     ]:
         htmleq = math2html(code)
         print(htmleq)
         html += "<p>" + htmleq + "</p>"
+
+    html += "<p><div style='position:absolute'>overlayed text</div>\n" \
+            "This is some dummy text</p>"
     with open("testmath.html", "w") as f:
         f.write(html)
     webbrowser.open("file://" + os.path.abspath(os.getcwd()) + "/testmath.html", new=2)
