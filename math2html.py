@@ -29,7 +29,8 @@ _math2html_symbols = {
     'ldots': '&hellip;',
     'Vert': '&Vert;',
     'log':  'log',
-    'prod': '<span style="font-size:150%">&prod;</span>'
+    'prod': '<span style="font-size:150%">&prod;</span>',
+    'equiv':    '&nbsp;&equiv;&nbsp;'
 }
 
 _math2html_letters = {
@@ -257,9 +258,10 @@ if __name__ == "__main__":
         # "2^s > \\omega/2",
         # "f_i\\circ\\omega\\Vert{\\mathcal ab}c \\lambda",
         "s'_i=s_{i-1}{\\rm \\ XOR\\ }(s_i{\\rm \\ OR\\ }s_{i+1})",
-        "\\begin{aligned}" +
-        "& a {\\rm\\ OR\\ }b = a+b-ab, \\\\\n" +
-        "& a {\\rm\\ XOR\\ }b = a+b-2ab." +
+        "\\begin{aligned}"
+        "&g_{1i}\\equiv(f_i^2-f_i)/Z_N,\\\\"
+        "&g_{2i}\\equiv(f_i\\circ\\omega+f_{i-1}-2f_{i-1}f_i\\circ\\omega-f_i-f_{i+1}+f_if_{i+1})/Z_N,\\\\"
+        "&g_{3i}\\equiv(f_i-a_i)/(X-c\\omega^N)."
         "\\end{aligned}",
         "Z_N(X)=\\prod_{n=0}^{N-1}(X-c\\omega^n)."
     ]:
