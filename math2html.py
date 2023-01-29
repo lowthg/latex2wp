@@ -30,7 +30,9 @@ _math2html_symbols = {
     'Vert': '&Vert;',
     'log':  'log',
     'prod': '<span style="font-size:150%">&prod;</span>',
-    'equiv':    '&nbsp;&equiv;&nbsp;'
+    'equiv':    '&nbsp;&equiv;&nbsp;',
+    '{':        '&lcub;',
+    '}':        '&rcub;&nbsp;'
 }
 
 _math2html_letters = {
@@ -263,13 +265,20 @@ if __name__ == "__main__":
         "&g_{2i}\\equiv(f_i\\circ\\omega+f_{i-1}-2f_{i-1}f_i\\circ\\omega-f_i-f_{i+1}+f_if_{i+1})/Z_N,\\\\"
         "&g_{3i}\\equiv(f_i-a_i)/(X-c\\omega^N)."
         "\\end{aligned}",
-        "Z_N(X)=\\prod_{n=0}^{N-1}(X-c\\omega^n)."
+        "\\{x_1,x_2,x_3,x_4\\}=\\{2,3,4,5\\}"
     ]:
         htmleq = math2html(code)
         print(htmleq)
         html += "<p>" + htmleq + "</p>"
 
-    html += "<p><div style='position:absolute'>overlayed text</div>\n" \
+    html += '<p>a = jgp + c + d + e + f + g + h<br>x&nbsp;=&nbsp;' \
+            '<span style="display:inline-block;width:2em;position:relative;">' \
+            '<span style="display:inline-block;padding-top:0.8em;position:relative;bottom:-1em;text-align:center;font-size:70%;white-space:nowrap">N - 1</span>' \
+            '<span style="display:inline-block;position:relative;left:0em;bottom:-0.6em;font-size:150%">&prod;</span>' \
+            '<span style="display:inline-block;padding-bottom:1.5em;position:relative;top:1.5em;width:2em;text-align:center;font-size:70%">i = 0</span>' \
+            '</span>' \
+            '(X-c&omega;<sup>N</sup>)<br>aa = jgp + c + d + e + f + g + h</p>'
+    html += "<p><span style='position:absolute'>overlayed text</span>\n" \
             "This is some dummy text</p>"
     with open("testmath.html", "w") as f:
         f.write(html)
