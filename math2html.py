@@ -34,7 +34,8 @@ _math2html_symbols = {
     'equiv':    '&nbsp;&equiv;&nbsp;',
     '{':        '&lcub;',
     '}':        '&rcub;&nbsp;',
-    'cup':      '&nbsp;&cup;&nbsp;'
+    'cup':      '&nbsp;&cup;&nbsp;',
+    'pm':       '&plusmn;'
 }
 
 _math2html_letters = {
