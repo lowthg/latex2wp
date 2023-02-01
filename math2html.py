@@ -24,15 +24,17 @@ _math2html_unary = {
 }
 
 _math2html_symbols = {
-    'le': '&nbsp;&leq;&nbsp;',
-    'circ': '&cir;',
-    'ldots': '&hellip;',
-    'Vert': '&Vert;',
-    'log':  'log',
-    'prod': '<span style="font-size:150%">&prod;</span>',
+    'le':       '&nbsp;&leq;&nbsp;',
+    'circ':     '&cir;',
+    'ldots':    '&hellip;',
+    'cdots':    '&ctdot;',
+    'Vert':     '&Vert;',
+    'log':      'log',
+    'prod':     '<span style="font-size:150%">&prod;</span>',
     'equiv':    '&nbsp;&equiv;&nbsp;',
     '{':        '&lcub;',
-    '}':        '&rcub;&nbsp;'
+    '}':        '&rcub;&nbsp;',
+    'cup':      '&nbsp;&cup;&nbsp;'
 }
 
 _math2html_letters = {
