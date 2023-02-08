@@ -35,7 +35,8 @@ _math2html_symbols = {
     '{':        '&lcub;',
     '}':        '&rcub;&nbsp;',
     'cup':      '&nbsp;&cup;&nbsp;',
-    'pm':       '&plusmn;'
+    'pm':       '&plusmn;',
+    'approx':   '&nbsp;&asymp;&nbsp;'
 }
 
 _math2html_letters = {
@@ -268,7 +269,7 @@ if __name__ == "__main__":
         "&g_{2i}\\equiv(f_i\\circ\\omega+f_{i-1}-2f_{i-1}f_i\\circ\\omega-f_i-f_{i+1}+f_if_{i+1})/Z_N,\\\\"
         "&g_{3i}\\equiv(f_i-a_i)/(X-c\\omega^N)."
         "\\end{aligned}",
-        "\\{x_1,x_2,x_3,x_4\\}=\\{2,3,4,5\\}"
+        "(\\log_2 N)^2\\approx 900"
     ]:
         htmleq = math2html(code)
         print(htmleq)
