@@ -33,6 +33,8 @@ _math2html_symbols = {
     'Vert':     '&Vert;',
     'log':      'log',
     'inf':      'inf',
+    'sin':      'sin',
+    'cos':      'cos',
     'colon':    ':&thinsp;',
     'prod':     '<span style="font-size:150%">&prod;</span>',
     'equiv':    '&nbsp;&equiv;&nbsp;',
@@ -227,6 +229,10 @@ def math2html_inner(expr: str, i: int, paren_depth: int = 0, single: bool = Fals
                 term = _math2html_letters[command]
                 italic = True
                 binary = True
+            elif command == 'sqrt':
+                term, i, temp = math2html_inner(expr, i, paren_depth + 1, True)
+                open = '&radic;<span style="border:none;border-top:solid;border-width:thin;{}">'.format(temp)
+                term = open + term + '</span>'
             elif command == 'mathcal':
                 term, i, temp = math2html_inner(expr, i, paren_depth + 1, True, 'mathcal')
                 if temp != '':
@@ -292,16 +298,13 @@ if __name__ == "__main__":
         "&g_{2i}\\equiv(f_i\\circ\\omega+f_{i-1}-2f_{i-1}f_i\\circ\\omega-f_i-f_{i+1}+f_if_{i+1})/Z_N,\\\\"
         "&g_{3i}\\equiv(f_i-a_i)/(X-c\\omega^N)."
         "\\end{aligned}",
-        "\\{B_t\\}_{t\\in[0,1]}",
-        "t\\mapsto X_{\\sigma+t}",
-        'x\\tilde T3 = 2',
-        '\\chi^2_3(\\mu)'
+        "\\sin\\theta=\\sqrt{s/t+x^2}"
     ]:
         htmleq = math2html(code)
         print(htmleq)
         html += "<p>" + htmleq + "</p>"
 
-    html += '<p><i>T&#x303;</i>T=3</p>'
+    html += '<p>&radic;<span style="border-top:solid;border-width:thin;"><i>s/t+x<sup>2</sup></i></span></p>'
 
     with open("testmath.html", "w") as f:
         f.write(html)
