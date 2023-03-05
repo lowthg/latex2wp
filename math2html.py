@@ -25,11 +25,15 @@ _math2html_unary = {
 
 _math2html_symbols = {
     'le':       '&nbsp;&leq;&nbsp;',
+    'ge':       '&nbsp;&geq;&nbsp;',
+    'rightarrow':       '&nbsp;&rarr;&nbsp;',
     'circ':     '&cir;',
     'ldots':    '&hellip;',
     'cdots':    '&ctdot;',
     'Vert':     '&Vert;',
     'log':      'log',
+    'inf':      'inf',
+    'colon':    ':&thinsp;',
     'prod':     '<span style="font-size:150%">&prod;</span>',
     'equiv':    '&nbsp;&equiv;&nbsp;',
     '{':        '&lcub;',
