@@ -33,10 +33,13 @@ _math2html_symbols = {
     'prod':     '<span style="font-size:150%">&prod;</span>',
     'equiv':    '&nbsp;&equiv;&nbsp;',
     '{':        '&lcub;',
-    '}':        '&rcub;&nbsp;',
+    '}':        '&rcub;',
     'cup':      '&nbsp;&cup;&nbsp;',
     'pm':       '&plusmn;',
-    'approx':   '&nbsp;&asymp;&nbsp;'
+    'approx':   '&nbsp;&asymp;&nbsp;',
+    'infty':    '&infin;',
+    'mapsto':   '&nbsp;&mapsto;&nbsp;',
+    'in':       '&nbsp;&in;&nbsp;'
 }
 
 _math2html_letters = {
@@ -120,10 +123,10 @@ def math2html_inner(expr: str, i: int, paren_depth: int = 0, single: bool = Fals
 
         if x == ' ' or x == '\n':
             continue
-        elif x == '(' or x == ')':
+        elif x in ['(', ')', '[', ']']:
             italic = False
             term = x
-            if x == '(':
+            if x == '(' or x == '[':
                 paren_depth += 1
                 binary = False
             else:
@@ -269,21 +272,13 @@ if __name__ == "__main__":
         "&g_{2i}\\equiv(f_i\\circ\\omega+f_{i-1}-2f_{i-1}f_i\\circ\\omega-f_i-f_{i+1}+f_if_{i+1})/Z_N,\\\\"
         "&g_{3i}\\equiv(f_i-a_i)/(X-c\\omega^N)."
         "\\end{aligned}",
-        "(\\log_2 N)^2\\approx 900"
+        "\\{B_t\\}_{t\\in[0,1]}",
+        "t\\mapsto X_{\\sigma+t}"
     ]:
         htmleq = math2html(code)
         print(htmleq)
         html += "<p>" + htmleq + "</p>"
 
-    html += '<p>a = jgp + c + d + e + f + g + h<br>x&nbsp;=&nbsp;' \
-            '<span style="display:inline-block;width:2em;position:relative;">' \
-            '<span style="display:inline-block;padding-top:0.8em;position:relative;bottom:-1em;text-align:center;font-size:70%;white-space:nowrap">N - 1</span>' \
-            '<span style="display:inline-block;position:relative;left:0em;bottom:-0.6em;font-size:150%">&prod;</span>' \
-            '<span style="display:inline-block;padding-bottom:1.5em;position:relative;top:1.5em;width:2em;text-align:center;font-size:70%">i = 0</span>' \
-            '</span>' \
-            '(X-c&omega;<sup>N</sup>)<br>aa = jgp + c + d + e + f + g + h</p>'
-    html += "<p><span style='position:absolute'>overlayed text</span>\n" \
-            "This is some dummy text</p>"
     with open("testmath.html", "w") as f:
         f.write(html)
     webbrowser.open("file://" + os.path.abspath(os.getcwd()) + "/testmath.html", new=2)
