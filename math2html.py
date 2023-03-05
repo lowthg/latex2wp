@@ -39,7 +39,8 @@ _math2html_symbols = {
     'approx':   '&nbsp;&asymp;&nbsp;',
     'infty':    '&infin;',
     'mapsto':   '&nbsp;&mapsto;&nbsp;',
-    'in':       '&nbsp;&in;&nbsp;'
+    'in':       '&nbsp;&in;&nbsp;',
+    'cdot':     '&middot;'
 }
 
 _math2html_letters = {
@@ -105,7 +106,7 @@ def parse_command(expr: str, i: int) -> (str, int):
     return result, i
 
 
-def math2html_inner(expr: str, i: int, paren_depth: int = 0, single: bool = False) -> (str, int, str):
+def math2html_inner(expr: str, i: int, paren_depth: int = 0, single: bool = False, mathstyle = 'normal') -> (str, int, str):
     """
     The main loop converting LaTeX expression to html
     """
@@ -170,7 +171,7 @@ def math2html_inner(expr: str, i: int, paren_depth: int = 0, single: bool = Fals
             if 'mathbb' in scopes[-1]:
                 italic = False
                 term = '&' + x + 'opf;'
-            elif 'mathcal' in scopes[-1]:
+            elif mathstyle == 'mathcal':
                 italic = False
                 term = '&' + x + 'scr;'
         elif '0' <= x <= '9' or x == '.':
@@ -222,7 +223,14 @@ def math2html_inner(expr: str, i: int, paren_depth: int = 0, single: bool = Fals
                 term = _math2html_letters[command]
                 italic = True
                 binary = True
-            elif command == 'mathbb' or command == 'mathcal' or command == 'rm':
+            elif command == 'mathcal':
+                term, i, temp = math2html_inner(expr, i, paren_depth + 1, True, 'mathcal')
+                if temp != '':
+                    if style != '':
+                        style += ';'
+                    style += temp
+                italic = False
+            elif command == 'mathbb' or command == 'rm':
                 scopes[-1] = set()
                 scopes[-1].add(command)
                 term = ''
@@ -283,7 +291,7 @@ if __name__ == "__main__":
         "\\{B_t\\}_{t\\in[0,1]}",
         "t\\mapsto X_{\\sigma+t}",
         'x\\tilde T3 = 2',
-        'T=2'
+        '\\chi^2_3(\\mu)'
     ]:
         htmleq = math2html(code)
         print(htmleq)
