@@ -72,15 +72,17 @@ def parse_arg(expr: str, i: int) -> (str, int):
     """
     depth = 0
     result = ''
+    while expr[i] == ' ':
+        i += 1
     while True:
         x = expr[i]
         i += 1
         if x == '}':
             depth -= 1
-        if depth > 0:
-            result += x
-        if x == '{':
+        elif x == '{':
             depth += 1
+        else:
+            result += x
         if depth <= 0:
             break
     return result, i
@@ -114,6 +116,7 @@ def math2html_inner(expr: str, i: int, paren_depth: int = 0, single: bool = Fals
     binary = False
     scopes = [{}]
     environs = []
+    tilde = False
 
     while i < len(expr):
         x = expr[i]
@@ -223,6 +226,9 @@ def math2html_inner(expr: str, i: int, paren_depth: int = 0, single: bool = Fals
                 scopes[-1] = set()
                 scopes[-1].add(command)
                 term = ''
+            elif command == 'tilde':
+                tilde = True
+                term = ''
             else:
                 raise Exception('Unknown command {}'.format(command))
         elif x == '&':
@@ -248,7 +254,9 @@ def math2html_inner(expr: str, i: int, paren_depth: int = 0, single: bool = Fals
         if paren_depth > 0:
             term = term.replace('&nbsp;', '&thinsp;')
         result += term
-
+        if tilde and term != '':
+            result += '&#x303;'
+            tilde = False
         if single and brace_depth == 0:
             break
 
@@ -273,11 +281,15 @@ if __name__ == "__main__":
         "&g_{3i}\\equiv(f_i-a_i)/(X-c\\omega^N)."
         "\\end{aligned}",
         "\\{B_t\\}_{t\\in[0,1]}",
-        "t\\mapsto X_{\\sigma+t}"
+        "t\\mapsto X_{\\sigma+t}",
+        'x\\tilde T3 = 2',
+        'T=2'
     ]:
         htmleq = math2html(code)
         print(htmleq)
         html += "<p>" + htmleq + "</p>"
+
+    html += '<p><i>T&#x303;</i>T=3</p>'
 
     with open("testmath.html", "w") as f:
         f.write(html)
