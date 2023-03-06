@@ -27,6 +27,7 @@ _math2html_symbols = {
     'le':       '&nbsp;&leq;&nbsp;',
     'ge':       '&nbsp;&geq;&nbsp;',
     'rightarrow':       '&nbsp;&rarr;&nbsp;',
+    'times':    '&times;',
     'circ':     '&cir;',
     'ldots':    '&hellip;',
     'cdots':    '&ctdot;',
@@ -44,6 +45,7 @@ _math2html_symbols = {
     '{':        '&lcub;',
     '}':        '&rcub;',
     'cup':      '&nbsp;&cup;&nbsp;',
+    'cap':      '&nbsp;&cap;&nbsp;',
     'pm':       '&plusmn;',
     'approx':   '&nbsp;&asymp;&nbsp;',
     'infty':    '&infin;',
@@ -58,12 +60,14 @@ _math2html_letters = {
 _math2html_env = {'aligned'}
 
 for letter in ['alpha', 'beta', 'gamma', 'delta', 'epsilon', 'zeta', 'eta', 'theta', 'iota',
-               'kappa', 'lambda', 'mu', 'nu', 'xi', 'omicron', 'pi', 'rho', 'sigma', 'tau',
-               'upsilon', 'phi', 'chi', 'psi',  'omega'
+               'kappa', 'lambda', 'mu', 'nu', 'xi', 'omicron', 'rho', 'sigma', 'tau',
+               'upsilon', 'phi', 'chi', 'psi', 'omega'
 ]:
-    _math2html_letters[letter] = '&' + letter + ';'
-    letter = letter[0].upper()
-    _math2html_letters[letter] = '&' + letter + ';'
+    _math2html_letters[letter] = ('&' + letter + ';', True)  # italic letter
+
+for letter in ['pi', 'Gamma', 'Delta', 'Theta', 'Lambda', 'Xi', 'Pi', 'Sigma', 'Phi', 'Chi', 'Psi', 'Omega'
+]:
+    _math2html_letters[letter] = ('&' + letter + ';', False)  # rm letter
 
 
 def math2html(expr: str):
@@ -229,8 +233,7 @@ def math2html_inner(expr: str, i: int, paren_depth: int = 0, single: bool = Fals
                 italic = False
                 binary = False
             elif command in _math2html_letters:
-                term = _math2html_letters[command]
-                italic = True
+                term, italic = _math2html_letters[command]
                 binary = True
             elif command == 'sqrt':
                 term, i, temp = math2html_inner(expr, i, paren_depth + 1, True)
@@ -301,7 +304,7 @@ if __name__ == "__main__":
         "&g_{2i}\\equiv(f_i\\circ\\omega+f_{i-1}-2f_{i-1}f_i\\circ\\omega-f_i-f_{i+1}+f_if_{i+1})/Z_N,\\\\"
         "&g_{3i}\\equiv(f_i-a_i)/(X-c\\omega^N)."
         "\\end{aligned}",
-        "\\sin\\theta=\\sqrt{s/t+x^2}"
+        "X_{\\tau(\\omega)}(\\omega)=1_{\\{\\omega\\in\\tau^{-1}(B)\\cap F\\}}"
     ]:
         htmleq = math2html(code)
         print(htmleq)
