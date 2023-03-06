@@ -27,7 +27,8 @@ _math2html_symbols = {
     'le':       '&nbsp;&leq;&nbsp;',
     'ge':       '&nbsp;&geq;&nbsp;',
     'rightarrow':       '&nbsp;&rarr;&nbsp;',
-    'times':    '&times;',
+    'times':    '&nbsp;&times;&nbsp;',
+    'otimes':   '&nbsp;&otimes;&nbsp;',
     'circ':     '&cir;',
     'ldots':    '&hellip;',
     'cdots':    '&ctdot;',
@@ -304,7 +305,7 @@ if __name__ == "__main__":
         "&g_{2i}\\equiv(f_i\\circ\\omega+f_{i-1}-2f_{i-1}f_i\\circ\\omega-f_i-f_{i+1}+f_if_{i+1})/Z_N,\\\\"
         "&g_{3i}\\equiv(f_i-a_i)/(X-c\\omega^N)."
         "\\end{aligned}",
-        "X_{\\tau(\\omega)}(\\omega)=1_{\\{\\omega\\in\\tau^{-1}(B)\\cap F\\}}"
+        "X_t(\\omega)=1_{\\{(t,\\omega)\\in B\\times F\\}}"
     ]:
         htmleq = math2html(code)
         print(htmleq)
