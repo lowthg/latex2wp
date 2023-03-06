@@ -35,6 +35,9 @@ _math2html_symbols = {
     'ldots':    '&hellip;',
     'cdots':    '&ctdot;',
     'Vert':     '&Vert;',
+    'lVert':    '&Vert;',
+    'rVert':    '&Vert;',
+    'vert':     '&vert;',
     'lvert':    '&vert;',
     'rvert':    '&vert;',
     'log':      'log',
@@ -318,7 +321,7 @@ if __name__ == "__main__":
         print(htmleq)
         html += "<p>" + htmleq + "</p>"
 
-    html += '<p>&tau;*&midast;&tau;<sup>&midast;&lowast;</sup></p>'
+    html += '<p>&tau;&#x334; &tau;&#x342; &tau;&#x303; o&#x303; &otilde; &pi;&#x303; p&#x303;</sup></p>'
 
     with open("testmath.html", "w") as f:
         f.write(html)
