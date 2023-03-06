@@ -13,7 +13,8 @@ _math2html_map = {
     '\'':   '&prime;',
     '<':    '&nbsp;&lt;&nbsp;',
     '>':    '&nbsp;&gt;&nbsp;',
-    '/':    '/'
+    '/':    '/',
+    '*':    '&lowast;'
 }
 
 _math2html_unary = {
@@ -38,6 +39,8 @@ _math2html_symbols = {
     'log':      'log',
     'inf':      'inf',
     'sup':      'sup',
+    'max':      'max',
+    'min':      'min',
     'sin':      'sin',
     'cos':      'cos',
     'colon':    ':&thinsp;',
@@ -52,7 +55,8 @@ _math2html_symbols = {
     'infty':    '&infin;',
     'mapsto':   '&nbsp;&mapsto;&nbsp;',
     'in':       '&nbsp;&in;&nbsp;',
-    'cdot':     '&middot;'
+    'cdot':     '&middot;',
+    'sum':      '&Sigma;'
 }
 
 _math2html_letters = {
@@ -60,11 +64,13 @@ _math2html_letters = {
 
 _math2html_env = {'aligned'}
 
-for letter in ['alpha', 'beta', 'gamma', 'delta', 'epsilon', 'zeta', 'eta', 'theta', 'iota',
+for letter in ['alpha', 'beta', 'gamma', 'delta', 'zeta', 'eta', 'theta', 'iota',
                'kappa', 'lambda', 'mu', 'nu', 'xi', 'omicron', 'rho', 'sigma', 'tau',
                'upsilon', 'phi', 'chi', 'psi', 'omega'
 ]:
     _math2html_letters[letter] = ('&' + letter + ';', True)  # italic letter
+
+_math2html_letters['epsilon'] = ('&varepsilon;', True)  # italic letter
 
 for letter in ['pi', 'Gamma', 'Delta', 'Theta', 'Lambda', 'Xi', 'Pi', 'Sigma', 'Phi', 'Chi', 'Psi', 'Omega'
 ]:
@@ -305,13 +311,13 @@ if __name__ == "__main__":
         "&g_{2i}\\equiv(f_i\\circ\\omega+f_{i-1}-2f_{i-1}f_i\\circ\\omega-f_i-f_{i+1}+f_if_{i+1})/Z_N,\\\\"
         "&g_{3i}\\equiv(f_i-a_i)/(X-c\\omega^N)."
         "\\end{aligned}",
-        "X_t(\\omega)=1_{\\{(t,\\omega)\\in B\\times F\\}}"
+        "\sum_i\mu_i^2=\mu"
     ]:
         htmleq = math2html(code)
         print(htmleq)
         html += "<p>" + htmleq + "</p>"
 
-    html += '<p>&radic;<span style="border-top:solid;border-width:thin;"><i>s/t+x<sup>2</sup></i></span></p>'
+    html += '<p>&tau;*&midast;&tau;<sup>&midast;&lowast;</sup></p>'
 
     with open("testmath.html", "w") as f:
         f.write(html)
