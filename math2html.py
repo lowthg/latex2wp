@@ -27,6 +27,7 @@ _math2html_unary = {
 _math2html_symbols = {
     'le':       '&nbsp;&leq;&nbsp;',
     'ge':       '&nbsp;&geq;&nbsp;',
+    'sim':      '&nbsp;&sim;&nbsp;',
     'rightarrow':       '&nbsp;&rarr;&nbsp;',
     'times':    '&nbsp;&times;&nbsp;',
     'otimes':   '&nbsp;&otimes;&nbsp;',
@@ -311,7 +312,7 @@ if __name__ == "__main__":
         "&g_{2i}\\equiv(f_i\\circ\\omega+f_{i-1}-2f_{i-1}f_i\\circ\\omega-f_i-f_{i+1}+f_if_{i+1})/Z_N,\\\\"
         "&g_{3i}\\equiv(f_i-a_i)/(X-c\\omega^N)."
         "\\end{aligned}",
-        "\sum_i\mu_i^2=\mu"
+        "1+at\sim1+2\lambda"
     ]:
         htmleq = math2html(code)
         print(htmleq)
