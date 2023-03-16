@@ -35,6 +35,9 @@ _math2html_symbols = {
     'ldots':    '&hellip;',
     'cdots':    '&ctdot;',
     'Vert':     '&Vert;',
+    'lVert':    '&Vert;',
+    'rVert':    '&Vert;',
+    'vert':     '&vert;',
     'lvert':    '&vert;',
     'rvert':    '&vert;',
     'log':      'log',
@@ -89,6 +92,7 @@ def math2html(expr: str):
     result, i, style = math2html_inner(expr, 0)
     assert i == len(expr)
     return result
+#    return '<span style="font-family:cambria math">' + result + '</span>'
 
 
 def parse_arg(expr: str, i: int) -> (str, int):
@@ -322,6 +326,8 @@ if __name__ == "__main__":
         html += "<p>" + htmleq + "</p>"
 
     html += '<p>&Popf;&primes;</sup></p>'
+    html += '<p><span style="font-family:cambria math"><i>&tau;&#x334; &tau;&#x342; &tau;&#x303; o&#x303; &otilde; &pi;&#x303; p&#x303; &Fscr;</i> T</span></p>'
+    html += '<p><i>&tau;&#x334; &tau;&#x342; &tau;&#x303; o&#x303; &otilde; &pi;&#x303; p&#x303; &Fscr;</i> T</p>'
 
     with open("testmath.html", "w") as f:
         f.write(html)
