@@ -52,6 +52,7 @@ _math2html_symbols = {
     'cup':      '&nbsp;&cup;&nbsp;',
     'cap':      '&nbsp;&cap;&nbsp;',
     'pm':       '&plusmn;',
+    'mp':       '&mnplus;',
     'approx':   '&nbsp;&asymp;&nbsp;',
     'infty':    '&infin;',
     'mapsto':   '&nbsp;&mapsto;&nbsp;',
@@ -67,11 +68,13 @@ _math2html_env = {'aligned'}
 
 for letter in ['alpha', 'beta', 'gamma', 'delta', 'zeta', 'eta', 'theta', 'iota',
                'kappa', 'lambda', 'mu', 'nu', 'xi', 'omicron', 'rho', 'sigma', 'tau',
-               'upsilon', 'phi', 'chi', 'psi', 'omega'
+               'upsilon', 'chi', 'psi', 'omega'
 ]:
     _math2html_letters[letter] = ('&' + letter + ';', True)  # italic letter
 
 _math2html_letters['epsilon'] = ('&varepsilon;', True)  # italic letter
+_math2html_letters['phi'] = ('&phiv;', True)  # italic letter
+_math2html_letters['varphi'] = ('&phi;', True)  # italic letter
 
 for letter in ['pi', 'Gamma', 'Delta', 'Theta', 'Lambda', 'Xi', 'Pi', 'Sigma', 'Phi', 'Chi', 'Psi', 'Omega'
 ]:
@@ -312,13 +315,13 @@ if __name__ == "__main__":
         "&g_{2i}\\equiv(f_i\\circ\\omega+f_{i-1}-2f_{i-1}f_i\\circ\\omega-f_i-f_{i+1}+f_if_{i+1})/Z_N,\\\\"
         "&g_{3i}\\equiv(f_i-a_i)/(X-c\\omega^N)."
         "\\end{aligned}",
-        "1+at\sim1+2\lambda"
+        "\\varphi_t(x\\mp X_0)"
     ]:
         htmleq = math2html(code)
         print(htmleq)
         html += "<p>" + htmleq + "</p>"
 
-    html += '<p>&tau;*&midast;&tau;<sup>&midast;&lowast;</sup></p>'
+    html += '<p>&Popf;&primes;</sup></p>'
 
     with open("testmath.html", "w") as f:
         f.write(html)
