@@ -47,6 +47,8 @@ _math2html_symbols = {
     'min':      'min',
     'sin':      'sin',
     'cos':      'cos',
+    'sinh':     'sinh',
+    'cosh':     'cosh',
     'colon':    ':&thinsp;',
     'prod':     '<span style="font-size:150%">&prod;</span>',
     'equiv':    '&nbsp;&equiv;&nbsp;',
