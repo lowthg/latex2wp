@@ -27,6 +27,7 @@ _math2html_unary = {
 _math2html_symbols = {
     'le':       '&nbsp;&leq;&nbsp;',
     'ge':       '&nbsp;&geq;&nbsp;',
+    'wedge':    '&thinsp;&wedge;&thinsp;',
     'sim':      '&nbsp;&sim;&nbsp;',
     'rightarrow':       '&nbsp;&rarr;&nbsp;',
     'times':    '&nbsp;&times;&nbsp;',
