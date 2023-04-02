@@ -114,6 +114,7 @@ def extract_body(m):
       whole document), normalizes the spacing, and removes comments
     """
     global labelpre
+    global inlinehtmlmath
     
     begin = re.compile("\\\\begin\s*")
     m = begin.sub("\\\\begin",m)
@@ -133,6 +134,16 @@ def extract_body(m):
     """
     labelpreobj = re.search(r"\\labelpre\s*\{(.*?)}", parse[0])
     labelpre = labelpreobj.group(1) if labelpreobj else ""
+
+    htmlmathobj = re.search(r"\\inlinemath\s*\{(.*?)}", parse[0])
+    inlinehtmlmath = False
+    if htmlmathobj:
+        if htmlmathobj.group(1) == "html":
+            inlinehtmlmath = True
+            print("Inline html math!!!")
+        else:
+            raise Exception("unknown inline math method: {}".format(htmlmathobj.group(1)))
+
 
     """
       removes comments, replaces double returns with <p> and
@@ -334,12 +345,18 @@ def process_math(M):
         """
 
         ishtml = False
+
+        mathstr = mb[1]
         
         if md[0] == "$":
-            if mb[1].startswith('\\html'):
+            use_htmlmath = inlinehtmlmath
+            if mathstr.startswith('\\html'):
+                use_htmlmath = True
+                mathstr = mathstr[5:]
+            if use_htmlmath:
                 for e in esc:
-                    mb[1] = mb[1].replace(e[1], e[0])
-                m = math2html(mb[1][5:])
+                    mathstr = mathstr.replace(e[1], e[0])
+                    m = math2html(mathstr)
             elif HTML:
                 m = m.replace("$", "")
                 m = m.replace("+", "%2B")
@@ -347,16 +364,16 @@ def process_math(M):
                 m = m.replace("'", "&#39;")
                 m = "<img src=\"http://l.wordpress.com/latex.php?latex=%7B"+m+"%7D"+endlatex+"\">"
             else:
-                m = "$latex {"+mb[1]+"}"+endlatex+"$"
+                m = "$latex {"+mathstr+"}"+endlatex+"$"
 
         else:
             #if md[0].find("\\begin") != -1:
             #   count["equation"] += 1
             #   mb[1] = mb[1] + "\\ \\ \\ \\ \\ ("+str(count["equation"])+")"
-            has_label = mb[1].find("\\label") != -1
+            has_label = mathstr.find("\\label") != -1
             if has_label:
-                mnolab = label.split(mb[1])
-                mlab = label.findall(mb[1])
+                mnolab = label.split(mathstr)
+                mlab = label.findall(mathstr)
                 """
                  Now the mathematical equation, which has already
                  been formatted for WordPress, is the union of
@@ -368,24 +385,24 @@ def process_math(M):
                 lab = lab.replace(":", "")
                 count["equation"] += 1
                 ref[lab] = count["equation"]
-                mb[1] = mnolab[0]+mnolab[1]
+                mathstr = mnolab[0]+mnolab[1]
 
             if md[0].find("html") != -1:
-                m = mb[1]
+                m = mathstr
                 ishtml = True	
             else:
                 if HTML:
-                    mb[1] = mb[1].replace("+", "%2B")
-                    mb[1] = mb[1].replace("&", "%26")
-                    mb[1] = mb[1].replace(" ", "+")
-                    mb[1] = mb[1].replace("'", "&#39;")
-                    m = "<img src=\"http://l.wordpress.com/latex.php?latex=\displaystyle "+mb[1]+endlatex+"\">"
-                elif mb[1].startswith('\\html'):
+                    mathstr = mathstr.replace("+", "%2B")
+                    mathstr = mathstr.replace("&", "%26")
+                    mathstr = mathstr.replace(" ", "+")
+                    mathstr = mathstr.replace("'", "&#39;")
+                    m = "<img src=\"http://l.wordpress.com/latex.php?latex=\displaystyle "+mathstr+endlatex+"\">"
+                elif mathstr.startswith('\\html'):
                     for e in esc:
-                        mb[1] = mb[1].replace(e[1], e[0])
-                    m = math2html(mb[1][5:])
+                        mathstr = mathstr.replace(e[1], e[0])
+                    m = math2html(mathstr[5:])
                 else:
-                    m = "$latex \displaystyle "+mb[1]+endlatex+"$"
+                    m = "$latex \displaystyle "+mathstr+endlatex+"$"
             if has_label:
                 mcell = "<td " + eqtdstyle + ">"+m+"</td>"
                 numcell = "<td style=\"width:40px;white-space:nowrap;border:none;text-align:right;font-style:normal;padding:0;\">("+str(count["equation"])+")</td>"
