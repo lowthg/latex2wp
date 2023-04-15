@@ -28,6 +28,7 @@ _math2html_symbols = {
     'le':       '&nbsp;&leq;&nbsp;',
     'ge':       '&nbsp;&geq;&nbsp;',
     'wedge':    '&thinsp;&wedge;&thinsp;',
+    'vee':      '&thinsp;&vee;&thinsp;',
     'sim':      '&nbsp;&sim;&nbsp;',
     'rightarrow':       '&nbsp;&rarr;&nbsp;',
     'times':    '&nbsp;&times;&nbsp;',
