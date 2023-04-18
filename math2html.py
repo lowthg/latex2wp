@@ -95,8 +95,9 @@ def math2html(expr: str):
     """
     result, i, style = math2html_inner(expr, 0)
     assert i == len(expr)
-    return result
+#    return result
 #    return '<span style="font-family:cambria math">' + result + '</span>'
+    return '<span style="display:inline-block;">' + result + '</span>'
 
 
 def parse_arg(expr: str, i: int) -> (str, int):
