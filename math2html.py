@@ -51,6 +51,7 @@ _math2html_symbols = {
     'cos':      'cos',
     'sinh':     'sinh',
     'cosh':     'cosh',
+    'exp':      'exp',
     'colon':    ':&thinsp;',
     'prod':     '<span style="font-size:150%">&prod;</span>',
     'equiv':    '&nbsp;&equiv;&nbsp;',
