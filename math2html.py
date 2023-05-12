@@ -52,6 +52,7 @@ _math2html_symbols = {
     'sinh':     'sinh',
     'cosh':     'cosh',
     'exp':      'exp',
+    'int':      ('&int;', False),
     'colon':    ':&thinsp;',
     'prod':     '<span style="font-size:150%">&prod;</span>',
     'equiv':    '&nbsp;&equiv;&nbsp;',
@@ -152,6 +153,7 @@ def math2html_inner(expr: str, i: int, paren_depth: int = 0, single: bool = Fals
     scopes = [{}]
     environs = []
     tilde = False
+    overbar = False
 
     while i < len(expr):
         x = expr[i]
@@ -251,7 +253,10 @@ def math2html_inner(expr: str, i: int, paren_depth: int = 0, single: bool = Fals
                 continue
             elif command in _math2html_symbols:
                 term = _math2html_symbols[command]
-                italic = False
+                if type(term) == tuple:
+                    term, italic = term
+                else:
+                    italic = False
                 binary = False
             elif command in _math2html_letters:
                 term, italic = _math2html_letters[command]
@@ -260,6 +265,8 @@ def math2html_inner(expr: str, i: int, paren_depth: int = 0, single: bool = Fals
                 term, i, temp = math2html_inner(expr, i, paren_depth + 1, True)
                 open = '&radic;<span style="border:none;border-top:solid;border-width:thin;{}">'.format(temp)
                 term = open + term + '</span>'
+            elif command == ',':
+                term = '&thinsp;'
             elif command == 'mathcal':
                 term, i, temp = math2html_inner(expr, i, paren_depth + 1, True, 'mathcal')
                 if temp != '':
@@ -273,6 +280,9 @@ def math2html_inner(expr: str, i: int, paren_depth: int = 0, single: bool = Fals
                 term = ''
             elif command == 'tilde':
                 tilde = True
+                term = ''
+            elif command == 'bar':
+                overbar = True
                 term = ''
             else:
                 raise Exception('Unknown command {}'.format(command))
@@ -302,6 +312,9 @@ def math2html_inner(expr: str, i: int, paren_depth: int = 0, single: bool = Fals
         if tilde and term != '':
             result += '&#x303;'
             tilde = False
+        if overbar and term != '':
+            result += '&#773;'
+            overbar = False
         if single and brace_depth == 0:
             break
 
@@ -325,15 +338,15 @@ if __name__ == "__main__":
         "&g_{2i}\\equiv(f_i\\circ\\omega+f_{i-1}-2f_{i-1}f_i\\circ\\omega-f_i-f_{i+1}+f_if_{i+1})/Z_N,\\\\"
         "&g_{3i}\\equiv(f_i-a_i)/(X-c\\omega^N)."
         "\\end{aligned}",
-        "\\varphi_t(x\\mp X_0)"
+        "\\bar B=\\int^1_0 B_t\\,dt"
     ]:
         htmleq = math2html(code)
         print(htmleq)
         html += "<p>" + htmleq + "</p>"
 
-    html += '<p>&Popf;&primes;</sup></p>'
-    html += '<p><span style="font-family:cambria math"><i>&tau;&#x334; &tau;&#x342; &tau;&#x303; o&#x303; &otilde; &pi;&#x303; p&#x303; &Fscr;</i> T</span></p>'
-    html += '<p><i>&tau;&#x334; &tau;&#x342; &tau;&#x303; o&#x303; &otilde; &pi;&#x303; p&#x303; &Fscr;</i> T</p>'
+    html += '<p><i>B&#773;x</i></p>'
+#    html += '<p><span style="font-family:cambria math"><i>&tau;&#x334; &tau;&#x342; &tau;&#x303; o&#x303; &otilde; &pi;&#x303; p&#x303; &Fscr;</i> T</span></p>'
+#    html += '<p><i>&tau;&#x334; &tau;&#x342; &tau;&#x303; o&#x303; &otilde; &pi;&#x303; p&#x303; &Fscr;</i> T</p>'
 
     with open("testmath.html", "w") as f:
         f.write(html)
