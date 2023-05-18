@@ -5,6 +5,8 @@ math2html - convert simple latex math expressions to html code
 import webbrowser
 import os
 
+_subspacing = ''
+
 _math2html_map = {
     '+':    '&nbsp;+&nbsp;',
     '-':    '&nbsp;-&nbsp;',
@@ -25,6 +27,7 @@ _math2html_unary = {
 }
 
 _math2html_symbols = {
+    'neq':      '&nbsp;&ne;&nbsp;',
     'le':       '&nbsp;&leq;&nbsp;',
     'ge':       '&nbsp;&geq;&nbsp;',
     'uparrow':  '&nbsp;&uarr;&nbsp;',
@@ -268,6 +271,12 @@ def math2html_inner(expr: str, i: int, paren_depth: int = 0, single: bool = Fals
                 term, i, temp = math2html_inner(expr, i, paren_depth + 1, True)
                 open = '&radic;<span style="border:none;border-top:solid;border-width:thin;{}">'.format(temp)
                 term = open + term + '</span>'
+            elif command == 'not':
+                temp, i = parse_arg(expr, i)
+                if temp != '=':
+                    raise Exception('command \\not undefined on argument {}'.format(term))
+                term = _math2html_symbols['neq']
+                italic = False
             elif command == ',':
                 term = '&thinsp;'
             elif command == 'mathcal':
@@ -310,7 +319,8 @@ def math2html_inner(expr: str, i: int, paren_depth: int = 0, single: bool = Fals
 
         in_italic = italic
         if paren_depth > 0:
-            term = term.replace('&nbsp;', '&thinsp;')
+            term = term.replace('&thinsp;', _subspacing)
+            term = term.replace('&nbsp;', _subspacing)
         result += term
         if tilde and term != '':
             result += '&#x303;'
