@@ -141,6 +141,9 @@ def extract_body(m):
         if htmlmathobj.group(1) == "html":
             inlinehtmlmath = True
             print("Inline html math!!!")
+        elif htmlmathobj.group(1) == "img":
+                inlinehtmlmath = False
+                print("Inline math images!!!")
         else:
             raise Exception("unknown inline math method: {}".format(htmlmathobj.group(1)))
 
@@ -353,6 +356,9 @@ def process_math(M):
             if mathstr.startswith('\\html'):
                 use_htmlmath = True
                 mathstr = mathstr[5:]
+            elif mathstr.startswith('\\img'):
+                use_htmlmath = False
+                mathstr = mathstr[4:]
             if use_htmlmath:
                 for e in esc:
                     mathstr = mathstr.replace(e[1], e[0])
