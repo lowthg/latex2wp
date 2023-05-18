@@ -27,10 +27,11 @@ _math2html_unary = {
 _math2html_symbols = {
     'le':       '&nbsp;&leq;&nbsp;',
     'ge':       '&nbsp;&geq;&nbsp;',
+    'uparrow':  '&nbsp;&uarr;&nbsp;',
     'wedge':    '&thinsp;&wedge;&thinsp;',
     'vee':      '&thinsp;&vee;&thinsp;',
     'sim':      '&nbsp;&sim;&nbsp;',
-    'rightarrow':       '&nbsp;&rarr;&nbsp;',
+    'rightarrow': '&nbsp;&rarr;&nbsp;',
     'times':    '&nbsp;&times;&nbsp;',
     'otimes':   '&nbsp;&otimes;&nbsp;',
     'circ':     '&cir;',
@@ -59,6 +60,7 @@ _math2html_symbols = {
     '{':        '&lcub;',
     '}':        '&rcub;',
     'cup':      '&nbsp;&cup;&nbsp;',
+    'bigcup':   '<font size="+2">&bigcup;</font>',
     'cap':      '&nbsp;&cap;&nbsp;',
     'pm':       '&plusmn;',
     'mp':       '&mnplus;',
@@ -67,7 +69,8 @@ _math2html_symbols = {
     'mapsto':   '&nbsp;&mapsto;&nbsp;',
     'in':       '&nbsp;&in;&nbsp;',
     'cdot':     '&middot;',
-    'sum':      '&Sigma;'
+    'sum':      '&Sigma;',
+    'nabla':    '&nabla;'
 }
 
 _math2html_letters = {
