@@ -272,6 +272,13 @@ def math2html_inner(expr: str, i: int, paren_depth: int = 0, single: bool = Fals
                 term, i, temp = math2html_inner(expr, i, paren_depth + 1, True)
                 open = '&radic;<span style="border:none;border-top:solid;border-width:thin;{}">'.format(temp)
                 term = open + term + '</span>'
+            elif command == 'frac':
+                over, i, temp = math2html_inner(expr, i, paren_depth + 1, True)
+                under, i, temp = math2html_inner(expr, i, paren_depth + 1, True)
+                open = '<span style="position:relative;bottom:-0.25em;display:inline-block;font-size:80%;">'
+                open_over = '<span style="display:block;border-bottom: 1px solid;line-height:0.85em;">'
+                open_under = '<span style="display:block;line-height:0.85em;">'
+                term = open + open_over + over + '</span>' + open_under + under + '</span></span>&VeryThinSpace;'
             elif command == 'not':
                 temp, i = parse_arg(expr, i)
                 if temp != '=':
@@ -353,7 +360,7 @@ if __name__ == "__main__":
         "&g_{2i}\\equiv(f_i\\circ\\omega+f_{i-1}-2f_{i-1}f_i\\circ\\omega-f_i-f_{i+1}+f_if_{i+1})/Z_N,\\\\"
         "&g_{3i}\\equiv(f_i-a_i)/(X-c\\omega^N)."
         "\\end{aligned}",
-        "\\bar B=\\int^1_0 B_t\\,dt"
+        "1-e^{-af}\ge\\frac12((af)\wedge1)"
     ]:
         htmleq = math2html(code)
         print(htmleq)
