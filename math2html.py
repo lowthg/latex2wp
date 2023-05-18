@@ -191,6 +191,7 @@ def math2html_inner(expr: str, i: int, paren_depth: int = 0, single: bool = Fals
             italic = False
             binary = True
             term, i, temp = math2html_inner(expr, i, paren_depth + 1, True)
+            term = term.replace('&thinsp;', _subspacing)
             tag = 'sub' if x == '_' else 'sup'
             if i < len(expr):
                 if (expr[i] == '^' or expr[i] == '_') and expr[i] != x:
@@ -279,6 +280,8 @@ def math2html_inner(expr: str, i: int, paren_depth: int = 0, single: bool = Fals
                 italic = False
             elif command == ',':
                 term = '&thinsp;'
+            elif command == ';':
+                term = '&thinsp;'
             elif command == 'mathcal':
                 term, i, temp = math2html_inner(expr, i, paren_depth + 1, True, 'mathcal')
                 if temp != '':
@@ -319,8 +322,7 @@ def math2html_inner(expr: str, i: int, paren_depth: int = 0, single: bool = Fals
 
         in_italic = italic
         if paren_depth > 0:
-            term = term.replace('&thinsp;', _subspacing)
-            term = term.replace('&nbsp;', _subspacing)
+            term = term.replace('&nbsp;', '&thinsp;')
         result += term
         if tilde and term != '':
             result += '&#x303;'
