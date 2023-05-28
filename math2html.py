@@ -30,6 +30,8 @@ _math2html_symbols = {
     'neq':      '&nbsp;&ne;&nbsp;',
     'le':       '&nbsp;&leq;&nbsp;',
     'ge':       '&nbsp;&geq;&nbsp;',
+    'subseteq': '&nbsp;&sube;&nbsp;',
+    'supseteq': '&nbsp;&supe;&nbsp;',
     'uparrow':  '&nbsp;&uarr;&nbsp;',
     'wedge':    '&thinsp;&wedge;&thinsp;',
     'vee':      '&thinsp;&vee;&thinsp;',
