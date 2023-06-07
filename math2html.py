@@ -28,6 +28,7 @@ _math2html_unary = {
 
 _math2html_symbols = {
     'neq':      '&nbsp;&ne;&nbsp;',
+    'notin':     '&nbsp;&NotElement;&nbsp;',
     'le':       '&nbsp;&leq;&nbsp;',
     'ge':       '&nbsp;&geq;&nbsp;',
     'subseteq': '&nbsp;&sube;&nbsp;',
@@ -39,6 +40,7 @@ _math2html_symbols = {
     'rightarrow': '&nbsp;&rarr;&nbsp;',
     'times':    '&nbsp;&times;&nbsp;',
     'otimes':   '&nbsp;&otimes;&nbsp;',
+    'setminus': '&thinsp;&setminus;&thinsp;',
     'circ':     '&cir;',
     'ldots':    '&hellip;',
     'cdots':    '&ctdot;',
@@ -121,9 +123,16 @@ def parse_arg(expr: str, i: int) -> (str, int):
     while True:
         x = expr[i]
         i += 1
-        if x == '}':
+        if x == '\\':
+            cmd, i = parse_command(expr, i)
+            result += '\\' + cmd
+        elif x == '}':
             depth -= 1
+            if depth > 0:
+                result += '}'
         elif x == '{':
+            if depth > 0:
+                result += '{'
             depth += 1
         else:
             result += x
@@ -283,9 +292,12 @@ def math2html_inner(expr: str, i: int, paren_depth: int = 0, single: bool = Fals
                 term = open + open_over + over + '</span>' + open_under + under + '</span></span>&VeryThinSpace;'
             elif command == 'not':
                 temp, i = parse_arg(expr, i)
-                if temp != '=':
-                    raise Exception('command \\not undefined on argument {}'.format(term))
-                term = _math2html_symbols['neq']
+                if temp == '=':
+                    term = _math2html_symbols['neq']
+                elif temp == '\\in':
+                    term = _math2html_symbols['notin']
+                else:
+                    raise Exception('command \\not undefined on argument {}'.format(temp))
                 italic = False
             elif command == ',':
                 term = '&thinsp;'
