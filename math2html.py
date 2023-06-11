@@ -213,6 +213,9 @@ def math2html_inner(expr: str, i: int, paren_depth: int = 0, single: bool = Fals
             else:
                 open = '<{} style=\"{}\">'.format(tag, temp)
             term = open + term + '</{}>'.format(tag)
+            if result.endswith('&nbsp;'):  # move space from before sub/sup
+                result = result[:-6]
+                term += '&nbsp;'
         elif x == '\'' and i < len(expr) and expr[i] == '_':
             italic = False
             term = "<span style='display:inline-block;width:0px'>&prime;</span>"
@@ -228,6 +231,7 @@ def math2html_inner(expr: str, i: int, paren_depth: int = 0, single: bool = Fals
             elif mathstyle == 'mathcal':
                 italic = False
                 term = '&' + x + 'scr;'
+#                term = '<span style="font-family:cambria math">&' + x + 'scr;</span>'
         elif '0' <= x <= '9' or x == '.':
             term = x
             italic = False
