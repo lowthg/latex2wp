@@ -230,7 +230,8 @@ def math2html_inner(expr: str, i: int, paren_depth: int = 0, single: bool = Fals
                 term = '&' + x + 'opf;'
             elif mathstyle == 'mathcal':
                 italic = False
-                term = '&' + x + 'scr;'
+#                term = '&' + x + 'scr;'
+                term = '<span style="font-family:cursive;"><i>' + x + '</i>&thinsp;</span>'
 #                term = '<span style="font-family:cambria math">&' + x + 'scr;</span>'
         elif '0' <= x <= '9' or x == '.':
             term = x
