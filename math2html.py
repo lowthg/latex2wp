@@ -42,6 +42,7 @@ _math2html_symbols = {
     'otimes':   '&nbsp;&otimes;&nbsp;',
     'setminus': '&thinsp;&setminus;&thinsp;',
     'circ':     '&cir;',
+    '%':        '%',
     'ldots':    '&hellip;',
     'cdots':    '&ctdot;',
     'Vert':     '&Vert;',
@@ -180,6 +181,9 @@ def math2html_inner(expr: str, i: int, paren_depth: int = 0, single: bool = Fals
 
         if x == ' ' or x == '\n':
             continue
+        elif x == ';':
+            italic = False
+            term = x
         elif x in ['(', ')', '[', ']']:
             italic = False
             term = x
