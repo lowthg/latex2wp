@@ -41,13 +41,13 @@ colorchoice = ["red","green","blue"]
 # assign any counter to any environment. Make sure that
 # maxcounter is an upper bound to the any counter being used
 
-T = { "theorem" : 0 , "lemma" : 0 , "proposition" : 0, "definition" : 0,
-               "corollary" : 0, "remark" : 3 , "example" : 1, "claim" : 4,
-               "exercise" : 2  }
+T = {"theorem": 0, "lemma": 0, "proposition": 0, "definition": 0,
+               "corollary": 0, "remark": 3, "example": 1, "claim": 4,
+               "exercise": 2, "conjecture": 0}
 
 # list of theorem-like environments
 ThmEnvs = ["theorem","definition","lemma","proposition","corollary","claim",
-           "remark","example","exercise"]
+           "remark","example","exercise", "conjecture"]
 
 # the way \begin{theorem}, \begin{lemma} etc are translated in HTML
 # the string _ThmType_ stands for the type of theorem
