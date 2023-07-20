@@ -31,6 +31,8 @@ _math2html_symbols = {
     'notin':     '&nbsp;&NotElement;&nbsp;',
     'le':       '&nbsp;&leq;&nbsp;',
     'ge':       '&nbsp;&geq;&nbsp;',
+    'prec':     '&nbsp;&prec;&nbsp;',
+    'preceq':   '&nbsp;&preceq;&nbsp;',
     'subseteq': '&nbsp;&sube;&nbsp;',
     'supseteq': '&nbsp;&supe;&nbsp;',
     'uparrow':  '&nbsp;&uarr;&nbsp;',
