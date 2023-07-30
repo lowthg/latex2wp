@@ -72,6 +72,7 @@ _math2html_symbols = {
     'cup':      '&nbsp;&cup;&nbsp;',
     'bigcup':   '<font size="+2">&bigcup;</font>',
     'cap':      '&nbsp;&cap;&nbsp;',
+    'bigcap':   '<font size="+2">&bigcap;</font>',
     'pm':       '&plusmn;',
     'mp':       '&mnplus;',
     'approx':   '&nbsp;&asymp;&nbsp;',
