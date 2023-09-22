@@ -98,6 +98,7 @@ for letter in ['alpha', 'beta', 'gamma', 'delta', 'zeta', 'eta', 'theta', 'iota'
 _math2html_letters['epsilon'] = ('&varepsilon;', True)  # italic letter
 _math2html_letters['phi'] = ('&phiv;', True)  # italic letter
 _math2html_letters['varphi'] = ('&phi;', True)  # italic letter
+_math2html_letters['ell'] = ('&ell;', True)  # italic letter
 
 for letter in ['pi', 'Gamma', 'Delta', 'Theta', 'Lambda', 'Xi', 'Pi', 'Sigma', 'Phi', 'Chi', 'Psi', 'Omega'
 ]:
