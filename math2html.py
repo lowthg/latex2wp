@@ -53,6 +53,8 @@ _math2html_symbols = {
     'vert':     '&vert;',
     'lvert':    '&vert;',
     'rvert':    '&vert;',
+    'lfloor':   '&lfloor;',
+    'rfloor':   '&rfloor;',
     'log':      'log',
     'inf':      'inf',
     'sup':      'sup',
