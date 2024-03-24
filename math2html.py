@@ -65,6 +65,7 @@ _math2html_symbols = {
     'sinh':     'sinh',
     'cosh':     'cosh',
     'exp':      'exp',
+    'lim':      'lim',
     'int':      ('&int;', False),
     'colon':    ':&thinsp;',
     'prod':     '<span style="font-size:150%">&prod;</span>',
